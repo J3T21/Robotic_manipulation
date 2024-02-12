@@ -1,0 +1,14 @@
+
+
+
+
+function DH = OpenManipX(theta1, )
+    % alpha a d theta metres degrees
+    Joint1 = [90 0 0.077 theta1];
+    Joint2 = [90 0.128 0 90+theta2];
+    Joint3 = [0 0.148 0 theta3];
+    Joint4 = [0 0.126 0 theta4];
+
+
+    DH = [Joint1;Joint2;Joint3]; 
+end
