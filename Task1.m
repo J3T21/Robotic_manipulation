@@ -1,7 +1,4 @@
-
-
-
-
+close all;
 % Example usage
 theta1 = 0; % Joint 1 angle in degrees
 theta2 = 0; % Joint 2 angle in degrees
@@ -10,11 +7,10 @@ theta4 = 0; % Joint 4 angle in degrees
 
 plot_OpenManipX(theta1, theta2, theta3, theta4);
 
-
 function plot_OpenManipX(theta1, theta2, theta3, theta4)
     % DH parameters for OpenManipulator-X
     % alpha a d theta (degrees)
-    DH = OpenManipX(theta1, theta2, theta3, theta4);
+    DH = DH_table(theta1, theta2, theta3, theta4);
 
     % Plot robot
     figure;
@@ -26,64 +22,77 @@ function plot_OpenManipX(theta1, theta2, theta3, theta4)
     view(3);
 
     % Plot links
-    base = [0; 0; 0];
+    base = [0; 0; 0; 1]; % Changed to column vector
     L1 = plot_link(base, DH(1,:), 'r');
     L2 = plot_link(L1, DH(2,:), 'g');
     L3 = plot_link(L2, DH(3,:), 'b');
     L4 = plot_link(L3, DH(4,:), 'k');
-
+    disp(eye(4))
+    disp(L1)
+    disp(L2)
+    disp(L3)
+    disp(L4)
     % Plot end-effector
-    plot3(L4(1), L4(2), L4(3), 'ko', 'MarkerSize', 8, 'LineWidth', 2);
-
+    plot3(L4(1), L4(2), L4(3), 'kx', 'MarkerSize', 8, 'LineWidth', 2);
     title('OpenManipulator-X');
     axis equal;
     hold off;
 end
 
-function link_end = plot_link(base, dh, color)
+function link_end = plot_link(start, dh_row, color)
     % Plot a link based on DH parameters
-    alpha = dh(1);
-    a = dh(2);
-    d = dh(3);
-    theta = dh(4);
+    alpha = dh_row(1);
+    a = dh_row(2);
+    d = dh_row(3);
+    theta = dh_row(4);
 
     % Transformation matrix
-    T = dh_matrix(alpha, a, d, theta);
-
-    % Define points
-    P1 = [0; 0; 0; 1];
-    P2 = [a; 0; 0; 1];
-    P3 = [a; 0; -d; 1];
-    P4 = [0; 0; -d; 1];
+    T = transformation_matrix(alpha, a, d, theta);
     
-    % Apply transformation
-    P1 = T * P1;
-    P2 = T * P2;
-    P3 = T * P3;
-    P4 = T * P4;
-    
+    final = T*start; % Corrected order of multiplication
     % Plot link
-    plot3([P1(1) P2(1) P3(1) P4(1)], [P1(2) P2(2) P3(2) P4(2)], [P1(3) P2(3) P3(3) P4(3)], color, 'LineWidth', 3);
+    plot3([start(1), final(1)], [start(2), final(2)], [start(3), final(3)], color, 'LineWidth', 3);
 
     % Compute end point of the link
-    link_end = base + T(1:3,4);
+    link_end = final; % Use the transformed endpoint
+end
+
+function T = Ti(dh_row)
+    % Plot a link based on DH parameters
+    alpha = dh_row(1);
+    a = dh_row(2);
+    d = dh_row(3);
+    theta = dh_row(4);
+
+    % Transformation matrix
+    T = transformation_matrix_craig(alpha, a, d, theta);
 end
 
 
-function T = dh_matrix(alpha, a, d, theta)
+function T = transformation_matrix(alpha, a, d, theta)
     % Calculate DH transformation matrix
-    T = [cos(theta) -sin(theta)*cos(alpha)  sin(theta)*sin(alpha) a*cos(theta);
-        sin(theta) cos(theta)*cos(alpha) -cos(theta)*cos(alpha) a*sin(theta);
-        0 sin(alpha) cos(alpha) d;
+    T = [cosd(theta) -sind(theta)*cosd(alpha)  sind(theta)*sind(alpha) a*cosd(theta);
+        sind(theta) cosd(theta)*cosd(alpha) -cosd(theta)*sind(alpha) a*sind(theta);
+        0 sind(alpha) cosd(alpha) d;
         0 0 0 1];
 end
 
-function DH = OpenManipX(theta1, theta2, theta3, theta4)
-    % alpha a d theta metres radians
-    theta_o = asin(0.024/0.128); %offset link angle
-    Joint1 = [deg2rad(90) 0 0.077 theta1];
+function T = transformation_matrix_craig(alpha, a, d, theta)
+    % Calculate DH transformation matrix
+    T = [cosd(theta) -sind(theta)  0 a;
+        sind(theta)*cosd(alpha) cosd(theta)*cosd(alpha) -sind(alpha) -sind(alpha)*d;
+        sind(theta)*sind(alpha) cosd(theta)*sind(alpha) cosd(alpha) cosd(alpha)*d;
+        0 0 0 1];
+end
+
+function DH = DH_table(theta1, theta2, theta3, theta4)
+    % alpha a d theta (radians)
+    theta_o = asind(0.024/0.130); % offset link angle
+    disp(theta_o)
+    Joint1 = [90 0 0.077 theta1];
     Joint2 = [0 0.13 0 theta2-theta_o];
     Joint3 = [0 0.124 0 theta3+theta_o];
     Joint4 = [0 0.126 0 theta4];
-    DH = [Joint1;Joint2;Joint3;Joint4]; 
+    DH = [Joint1; Joint2; Joint3; Joint4];
+    disp(DH)
 end
