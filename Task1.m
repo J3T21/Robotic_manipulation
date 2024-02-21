@@ -100,9 +100,17 @@ function IK_final = choose_kinematic(joint_angles)
     j2=rad_to_j2(joint_angles(1,2)+theta_o); 
     j3=rad_to_j3(joint_angles(1,3)-theta_o);
     j4=rad_to_j4(joint_angles(1,4));
-    
-    if (j2 < 760) || (j2 > 3290) 
-    
+
+    if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450)
+        j1=rad_to_j1(joint_angles(2,1));
+        j2=rad_to_j2(joint_angles(2,2)+theta_o); 
+        j3=rad_to_j3(joint_angles(2,3)-theta_o);
+        j4=rad_to_j4(joint_angles(2,4));
+        if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450)
+            error('Joint angles are out of range for both IK solvers');
+        end
+    end
+    IK_final = [j1, j2, j3, j4];   
 end
 function IK = inverse_kinematic(x_ef,y_ef,z_ef)
     z_ef=z_ef-0.077;
