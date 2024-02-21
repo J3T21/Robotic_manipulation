@@ -7,12 +7,12 @@ theta_o = asin(0.024/0.130); % offset link angle
 % theta2 = [theta2, zeros(1, 315 - length(theta2))];
 % theta3 = [zeros(length1)]; % Joint 3 angle in rads
 %theta4 = [zeros(length1)]; % Joint 4 angle in rads
-angles=inverse_kinematic(0.22,0.17,0);
+angles=choose_kinematic(inverse_kinematic(0.2,0.2,0));
 %disp(([angles(1,1), angles(1,2)+theta_o, angles(1,3)-theta_o, angles(1,4)]));
-disp(([angles(2,1), angles(2,2)+theta_o, angles(2,3)-theta_o, angles(2,4)]));
+%disp(([angles(2,1), angles(2,2)+theta_o, angles(2,3)-theta_o, angles(2,4)]));
 %plot_OpenManipX(theta1, theta2, theta3, theta4);
-plot_OpenManipX(0, 0, 0, 0);
-plot_OpenManipX(angles(2,1), angles(2,2)+theta_o, angles(2,3)-theta_o, angles(2,4));
+%plot_OpenManipX(0, 0, 0, 0);
+plot_OpenManipX(angles(1), angles(2), angles(3), angles(4));
 function plot_OpenManipX(theta1, theta2, theta3, theta4)
     % DH parameters for OpenManipulator-X
     % alpha a d theta (degrees)
@@ -95,24 +95,32 @@ function DH = DH_table(theta1, theta2, theta3, theta4)
     Joint4 = [0 0.126 0 theta4];
     DH = [Joint1; Joint2; Joint3; Joint4];
 end
+
 function IK_final = choose_kinematic(joint_angles)
     j1=rad_to_j1(joint_angles(1,1));
-    j2=rad_to_j2(joint_angles(1,2)+theta_o); 
-    j3=rad_to_j3(joint_angles(1,3)-theta_o);
+    j2=rad_to_j2(joint_angles(1,2)); 
+    j3=rad_to_j3(joint_angles(1,3));
     j4=rad_to_j4(joint_angles(1,4));
-
-    if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450)
+    disp([j1 j2 j3 j4])
+    if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(1,:)))
+        %warning('IK using positive cosine component out of range')
         j1=rad_to_j1(joint_angles(2,1));
-        j2=rad_to_j2(joint_angles(2,2)+theta_o); 
-        j3=rad_to_j3(joint_angles(2,3)-theta_o);
+        j2=rad_to_j2(joint_angles(2,2)); 
+        j3=rad_to_j3(joint_angles(2,3));
         j4=rad_to_j4(joint_angles(2,4));
-        if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450)
+        disp([j1 j2 j3 j4])
+        if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(2,:)))
             error('Joint angles are out of range for both IK solvers');
+        else
+            IK_final = joint_angles(2,:);
         end
+    else
+        IK_final = joint_angles(1,:);
     end
-    IK_final = [j1, j2, j3, j4];   
 end
+
 function IK = inverse_kinematic(x_ef,y_ef,z_ef)
+    theta_o = asin(0.024/0.130);
     z_ef=z_ef-0.077;
     theta1 = atan(y_ef/x_ef);
     r_ef = sqrt(x_ef^2+y_ef^2);
@@ -131,7 +139,7 @@ function IK = inverse_kinematic(x_ef,y_ef,z_ef)
     theta2_minus = atan(sintheta2_minus/costheta2_minus);
     theta4_plus = phi-theta2_plus-theta3_plus;
     theta4_minus = phi-theta2_minus-theta3_minus;
-    IK = [theta1, theta2_plus, theta3_plus, theta4_plus; theta1, theta2_minus, theta3_minus, theta4_minus];
+    IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
 end
 
 function encoder1 = rad_to_j1(theta1)
@@ -141,19 +149,19 @@ end
 function encoder2 = rad_to_j2(theta2)
     encoder2=3072-rads_to_steps(theta2);
     if (encoder2 < 760) || (encoder2 > 3290)
-        warning('Joint 2 angle is out of range');
+        %warning('Joint 2 angle is out of range');
     end
 end
 function encoder3 = rad_to_j3(theta3)
     encoder3=1024-rads_to_steps(theta3);
     if (encoder3 < 695) || (encoder3 > 3060)
-        warning('Joint 3 angle is out of range');
+        %warning('Joint 3 angle is out of range');
     end
 end
 function encoder4 = rad_to_j4(theta4)
     encoder4=2048-rads_to_steps(theta4);
     if (encoder4 < 820) || (encoder4 > 3450)
-        warning('Joint 4 angle is out of range');
+        %warning('Joint 4 angle is out of range');
     end
 end
 function steps = rads_to_steps(rads)
