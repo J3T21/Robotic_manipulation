@@ -3,24 +3,47 @@ close all;
 %theta_o = asin(0.024/0.130); % offset link angle
 
 %%% Forward kinematic simulation 
-
+%{
 theta1 = [-pi/2:0.01:pi/2, pi/2:-0.01:0,zeros(1,777)]; % Joint 1 angle in rads
 theta2 = [zeros(1,473),0:-0.01:-0.33,-0.33:0.01:3.54,3.54:-0.01:0];
 theta3 = [zeros(1,473),0:0.01:0.504, 0.504:-0.01:-3.12 , -3.12:0.01:0 , zeros(1,50)];
 theta4 = [zeros(1,441),0:0.01:1.8837,1.8837:-0.01:-2.15 , -2.15:0.01:0];
-plot_OpenManipX(theta1, theta2, theta3, theta4);
+plot_OpenManipX(theta1, theta2, theta3, theta4,0);
 %}
-angles=choose_kinematic(inverse_kinematic(0.2,0.2,0));
-%plot_OpenManipX(0, 0, 0, 0);
-%plot_OpenManipX(angles(1), angles(2), angles(3), angles(4));
-function plot_OpenManipX(theta1, theta2, theta3, theta4)
+%%% Backwards kinematic simuation 
+%{
+%%% xy-plane
+angles_xy=[choose_kinematic(inverse_kinematic(0.2,-0.2,0)); 
+        choose_kinematic(inverse_kinematic(0.3,-0.2,0));
+        choose_kinematic(inverse_kinematic(0.3,-0.1,0));
+        choose_kinematic(inverse_kinematic(0.2,-0.1,0));
+        choose_kinematic(inverse_kinematic(0.2,-0.2,0))];
+plot_OpenManipX(angles_xy(:,1), angles_xy(:,2), angles_xy(:,3), angles_xy(:,4),1);
+%%% xz-plane
+angles_xz=[choose_kinematic(inverse_kinematic(0.2,0,0)); 
+        choose_kinematic(inverse_kinematic(0.3,0,0));
+        choose_kinematic(inverse_kinematic(0.3,0,0.1));
+        choose_kinematic(inverse_kinematic(0.2,0,0.1));
+        choose_kinematic(inverse_kinematic(0.2,0,0))];
+plot_OpenManipX(angles_xz(:,1), angles_xz(:,2), angles_xz(:,3), angles_xz(:,4),1);
+%%% yz-plane
+angles_yz=[choose_kinematic(inverse_kinematic(0,-0.2,0)); 
+        choose_kinematic(inverse_kinematic(0,-0.3,0));
+        choose_kinematic(inverse_kinematic(0,-0.3,0.1));
+        choose_kinematic(inverse_kinematic(0,-0.2,0.1));
+        choose_kinematic(inverse_kinematic(0,-0.2,0))];
+plot_OpenManipX(angles_yz(:,1), angles_yz(:,2), angles_yz(:,3), angles_yz(:,4),1);
+%}
+function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
     % alpha a d theta (degrees)
     figure;
-    
+    set(gcf, 'Position', get(0, 'Screensize'));
+    colororder("glow12");
     if length(theta1) ~= length(theta2) || length(theta2) ~= length(theta3) || length(theta3) ~= length(theta4)
         error('Input angle arrays must have the same length');
     end
+    trace = [];
     for i = 1:length(theta1)
         clf;
         hold on;
@@ -46,13 +69,19 @@ function plot_OpenManipX(theta1, theta2, theta3, theta4)
         plot3([L0(1,4),L1(1,4)],[L0(2,4),L1(2,4)],[L0(3,4),L1(3,4)],'red','LineWidth', 3);
         plot3([L1(1,4),L2(1,4)],[L1(2,4),L2(2,4)],[L1(3,4),L2(3,4)],'green','LineWidth', 3);
         plot3([L2(1,4),L3(1,4)],[L2(2,4),L3(2,4)],[L2(3,4),L3(3,4)],'blue','LineWidth', 3);
-        plot3([L3(1,4),L4(1,4)],[L3(2,4),L4(2,4)],[L3(3,4),L4(3,4)],'black','LineWidth', 3);  
-        
+        plot3([L3(1,4),L4(1,4)],[L3(2,4),L4(2,4)],[L3(3,4),L4(3,4)],'black','LineWidth', 3);          
         plot3(L4(1,4), L4(2,4), L4(3,4), 'rx', 'MarkerSize', 10);
-        axis([-0.13 0.38 -0.38 0.38 0 0.457]);
+        if draw_lines
+            trace=[trace,L4(1:3,4)];
+            disp(size(trace));
+            for j=1:(size(trace,2)-1)
+                plot3([trace(1,j),trace(1,j+1)],[trace(2,j), trace(2,j+1)],[trace(3,j),trace(3,j+1)],'LineWidth', 3);
+            end            
+        end        
+        axis([-0.15 0.38 -0.38 0.38 0 0.457]);
         view(45,45);
         hold off;
-        pause(0.01);
+        pause(1);
     end
 end
 
