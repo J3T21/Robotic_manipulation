@@ -1,18 +1,18 @@
 close all;
 % Example usage
-theta_o = asin(0.024/0.130); % offset link angle
-% theta1 = [-pi/2:0.01:pi/2]; % Joint 1 angle in rads
-% length1=length(theta1)
-% theta2 = [theta_o:0.01:pi/3+theta_o] ; % Joint 2 angle in rads
-% theta2 = [theta2, zeros(1, 315 - length(theta2))];
-% theta3 = [zeros(length1)]; % Joint 3 angle in rads
-%theta4 = [zeros(length1)]; % Joint 4 angle in rads
+%theta_o = asin(0.024/0.130); % offset link angle
+
+%%% Forward kinematic simulation 
+
+theta1 = [-pi/2:0.01:pi/2, pi/2:-0.01:0,zeros(1,777)]; % Joint 1 angle in rads
+theta2 = [zeros(1,473),0:-0.01:-0.33,-0.33:0.01:3.54,3.54:-0.01:0];
+theta3 = [zeros(1,473),0:0.01:0.504, 0.504:-0.01:-3.12 , -3.12:0.01:0 , zeros(1,50)];
+theta4 = [zeros(1,441),0:0.01:1.8837,1.8837:-0.01:-2.15 , -2.15:0.01:0];
+plot_OpenManipX(theta1, theta2, theta3, theta4);
+%}
 angles=choose_kinematic(inverse_kinematic(0.2,0.2,0));
-%disp(([angles(1,1), angles(1,2)+theta_o, angles(1,3)-theta_o, angles(1,4)]));
-%disp(([angles(2,1), angles(2,2)+theta_o, angles(2,3)-theta_o, angles(2,4)]));
-%plot_OpenManipX(theta1, theta2, theta3, theta4);
 %plot_OpenManipX(0, 0, 0, 0);
-plot_OpenManipX(angles(1), angles(2), angles(3), angles(4));
+%plot_OpenManipX(angles(1), angles(2), angles(3), angles(4));
 function plot_OpenManipX(theta1, theta2, theta3, theta4)
     % DH parameters for OpenManipulator-X
     % alpha a d theta (degrees)
@@ -88,7 +88,6 @@ end
 function DH = DH_table(theta1, theta2, theta3, theta4)
     % alpha a d theta (radians)
     theta_o = asin(0.024/0.130); % offset link angle
-    disp(theta_o)
     Joint1 = [deg2rad(90) 0 0.077 theta1];
     Joint2 = [0 0.13 0 theta2-theta_o];
     Joint3 = [0 0.124 0 theta3+theta_o];
@@ -101,14 +100,12 @@ function IK_final = choose_kinematic(joint_angles)
     j2=rad_to_j2(joint_angles(1,2)); 
     j3=rad_to_j3(joint_angles(1,3));
     j4=rad_to_j4(joint_angles(1,4));
-    disp([j1 j2 j3 j4])
     if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(1,:)))
         %warning('IK using positive cosine component out of range')
         j1=rad_to_j1(joint_angles(2,1));
         j2=rad_to_j2(joint_angles(2,2)); 
         j3=rad_to_j3(joint_angles(2,3));
         j4=rad_to_j4(joint_angles(2,4));
-        disp([j1 j2 j3 j4])
         if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(2,:)))
             error('Joint angles are out of range for both IK solvers');
         else
