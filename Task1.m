@@ -80,6 +80,9 @@ function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
         L2 = T0_2*L0;
         L3 = T0_3*L0;
         L4 = T0_4*L0;
+        % TODO: plot axis instead of points
+        
+
         plot3([L0(1,4),L1(1,4)],[L0(2,4),L1(2,4)],[L0(3,4),L1(3,4)],'red','LineWidth', 3);
         plot3([L1(1,4),L2(1,4)],[L1(2,4),L2(2,4)],[L1(3,4),L2(3,4)],'green','LineWidth', 3);
         plot3([L2(1,4),L3(1,4)],[L2(2,4),L3(2,4)],[L2(3,4),L3(3,4)],'blue','LineWidth', 3);
