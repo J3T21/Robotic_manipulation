@@ -88,14 +88,14 @@ end
 % ----- SET MOTION LIMITS ----------- %
 ADDR_MAX_POS = 48;
 ADDR_MIN_POS = 52;
-MAX_POS = 3400;
-MIN_POS = 600;
-% Set max position limit
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_MAX_POS, MAX_POS);
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_MAX_POS, MAX_POS);
-% Set min position limit
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_MIN_POS, MIN_POS);
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_MIN_POS, MIN_POS);
+% MAX_POS = 3400;
+% MIN_POS = 600;
+% % Set max position limit
+% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_MAX_POS, MAX_POS);
+% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_MAX_POS, MAX_POS);
+% % Set min position limit
+% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_MIN_POS, MIN_POS);
+% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_MIN_POS, MIN_POS);
 % ---------------------------------- %
 
 
@@ -109,86 +109,19 @@ else
     return;
 end
 
-% Put actuator into Position Control Mode
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_OPERATING_MODE, 3);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_OPERATING_MODE, 3);
+
+% enter move function here depending on the position of the dynamixel
+move(port_num,)
+
+
 
 
 % Disable Dynamixel Torque
- % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
- % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
- % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
- % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
- % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
- write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
- write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
- write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
- write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
- write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
-
-dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
-dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
-
-if dxl_comm_result ~= COMM_SUCCESS
-    fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result));
-elseif dxl_error ~= 0
-    fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
-else
-    fprintf('Dynamixel has been successfully connected \n');
-end
-% enter function here measure / task1 /task2
-num_steps = 800;
-    
-
-    frequency = 100;  % 1 Hz for example
-    
-
-    t = linspace(0, 1, num_steps);  % Assuming one second duration
-    
-
-    amplitude = 1000;  
-    sin_wave = amplitude * sin(2 * pi * frequency * t)+2046;
-    disp(sin_wave)
-    for i=1:400
-
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_POSITION, typecast(int32(sin_wave(i)), 'int32'));
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, typecast(int32(2046), 'int32'));
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_POSITION, typecast(int32(2046), 'int32'));
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_POSITION, typecast(int32(2046), 'int32'));
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_POSITION, typecast(int32(sin_wave(i+100)), 'int32'));
-        while 1
-            % Read present position
-            dxl_present_position = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_PRESENT_POSITION);
-            dxl_present_position_2 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_PRESENT_POSITION);
-            if getLastTxRxResult(port_num, PROTOCOL_VERSION) ~= COMM_SUCCESS
-                printTxRxResult(PROTOCOL_VERSION, getLastTxRxResult(port_num, PROTOCOL_VERSION));
-            elseif getLastRxPacketError(port_num, PROTOCOL_VERSION) ~= 0
-                printRxPacketError(PROTOCOL_VERSION, getLastRxPacketError(port_num, PROTOCOL_VERSION));
-            end
-
-            fprintf('[ID:%03d] GoalPos:%03d  PresPos:%03d\n', DXL_ID, sin_wave(i), typecast(uint32(dxl_present_position), 'int32'));
-            fprintf('[ID:%03d] GoalPos 2:%03d  PresPos:%03d\n', DXL_ID_2, sin_wave(i), typecast(uint32(dxl_present_position_2), 'int32'));
-
-            if ~(abs(sin_wave(i) - typecast(uint32(dxl_present_position), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
-                break;
-            end
-            if ~(abs(sin_wave(i) - typecast(uint32(dxl_present_position_2), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
-                break;
-            end
-        end
-    end
-
-
-% Disable Dynamixel Torque
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE);
-dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
-dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
-if dxl_comm_result ~= COMM_SUCCESS
-    fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result));
-elseif dxl_error ~= 0
-    fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
-end
-
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 0);
+write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 0);
 % Close port
 closePort(port_num);
 fprintf('Port Closed \n');
@@ -199,85 +132,76 @@ unloadlibrary(lib_name);
 
 close all;
 clear all;
-function t=t1(theta)
-    t =[cos(theta) -sin(theta) 0 ; sin(theta) cos(theta) 0 ; 0 0 1];  
-end
-function t=t2_t3(theta)
-    t =[cos(theta) -sin(theta) 0 ; sin(theta) cos(theta) 80 ; 0 0 1];  
-end
 
-function t=t4(theta)
-    t =[cos(theta) -sin(theta) 0 ; sin(theta) cos(theta) 160 ; 0 0 1];  
-end
-function measure()
 
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 0);
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 0);
 
-    i = 0;
-            j = 0;
-        while (j<200)
-            j = j+1;
+
+function move(port_num,encoder1,encoder2,encoder3,encoder4,encoder5)
+    ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
+    ADDR_PRO_GOAL_POSITION       = 116; 
+    ADDR_PRO_PRESENT_POSITION    = 132; 
+    ADDR_PRO_OPERATING_MODE      = 11;
+    PROTOCOL_VERSION            = 2.0; 
+
+    DXL_ID                      = 11;            % Dynamixel ID: 1
+    DXL_ID_2                      = 12;            % Dynamixel ID: 2
+    DXL_ID_3                     = 13;            % Dynamixel ID: 3
+    DXL_ID_4                      = 14;            % Dynamixel ID: 4
+    DXL_ID_5                      = 15;   
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_OPERATING_MODE, 3);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_OPERATING_MODE, 3);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_OPERATING_MODE, 3);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_OPERATING_MODE, 3);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_OPERATING_MODE, 3);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 1);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 1);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 1);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 1);
+    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 1);
+   
     
-            % Read present position
-            dxl_present_position = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_PRESENT_POSITION);
-            dxl_present_position_2 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_PRESENT_POSITION);
-            dxl_comm_result = getLastTxRxResult(port_num, PROTOCOL_VERSION);
-    
-            dxl_error = getLastRxPacketError(port_num, PROTOCOL_VERSION);
-    
-            if dxl_comm_result ~= COMM_SUCCESS
-                fprintf('%s\n', getTxRxResult(PROTOCOL_VERSION, dxl_comm_result));
-            elseif dxl_error ~= 0
-                fprintf('%s\n', getRxPacketError(PROTOCOL_VERSION, dxl_error));
-            end
-    
-            fprintf('[ID:%03d] Position: %03d\n', DXL_ID, 360*(typecast(uint32(dxl_present_position), 'int32'))/4096);
-    
-            fprintf('[ID:%03d] Position 2: %03d\n', DXL_ID, 360*(typecast(uint32(dxl_present_position_2), 'int32'))/4096);
-    
-            if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
-                break;
-            end
-        end
-end
-function move()
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
-    write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE);
+    % Write goal position
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_POSITION, typecast(encoder1, 'uint32'));
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, typecast(encoder2, 'uint32'));
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_POSITION, typecast(encoder3, 'uint32'));
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_POSITION, typecast(encoder4, 'uint32'));
+    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_POSITION, typecast(encoder5, 'uint32'));
+
+
     while 1
-    
-    
-        % Write goal position
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_POSITION, typecast(int32(dxl_goal_position(index)), 'uint32'));
-        write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, typecast(int32(dxl_goal_position(index)), 'uint32'));
-    
-    
-        while 1
-            % Read present position
-            dxl_present_position = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_PRESENT_POSITION);
-            dxl_present_position_2 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_PRESENT_POSITION);
-            if getLastTxRxResult(port_num, PROTOCOL_VERSION) ~= COMM_SUCCESS
-                printTxRxResult(PROTOCOL_VERSION, getLastTxRxResult(port_num, PROTOCOL_VERSION));
-            elseif getLastRxPacketError(port_num, PROTOCOL_VERSION) ~= 0
-                printRxPacketError(PROTOCOL_VERSION, getLastRxPacketError(port_num, PROTOCOL_VERSION));
-            end
-    
-            fprintf('[ID:%03d] GoalPos:%03d  PresPos:%03d\n', DXL_ID, dxl_goal_position(index), typecast(uint32(dxl_present_position), 'int32'));
-            fprintf('[ID:%03d] GoalPos 2:%03d  PresPos:%03d\n', DXL_ID_2, dxl_goal_position(index), typecast(uint32(dxl_present_position_2), 'int32'));
-    
-            if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
-                break;
-            end
-            if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position_2), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
-                break;
-            end
+        % Read present position
+        dxl_present_position = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_PRESENT_POSITION);
+        dxl_present_position_2 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_PRESENT_POSITION);
+        dxl_present_position_3 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_PRESENT_POSITION);
+        dxl_present_position_4 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_PRESENT_POSITION);
+        dxl_present_position_5 = read4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_PRESENT_POSITION);
+
+        if getLastTxRxResult(port_num, PROTOCOL_VERSION) ~= COMM_SUCCESS
+            printTxRxResult(PROTOCOL_VERSION, getLastTxRxResult(port_num, PROTOCOL_VERSION));
+        elseif getLastRxPacketError(port_num, PROTOCOL_VERSION) ~= 0
+            printRxPacketError(PROTOCOL_VERSION, getLastRxPacketError(port_num, PROTOCOL_VERSION));
         end
-    
-        % Change goal position
-        if index == 1
-            index = 2;
-        else
-            index = 1;
+
+        fprintf('[ID:%03d] GoalPos: %03d  PresPos:%03d\n', DXL_ID, dxl_goal_position(index), typecast(uint32(dxl_present_position), 'int32'));
+        fprintf('[ID:%03d] GoalPos 2: %03d  PresPos:%03d\n', DXL_ID_2, dxl_goal_position(index), typecast(uint32(dxl_present_position_2), 'int32'));
+        fprintf('[ID:%03d] GoalPos 3: %03d  PresPos:%03d\n', DXL_ID_3, dxl_goal_position(index), typecast(uint32(dxl_present_position_3), 'int32'));
+        fprintf('[ID:%03d] GoalPos 4: %03d  PresPos:%03d\n', DXL_ID_4, dxl_goal_position(index), typecast(uint32(dxl_present_position_4), 'int32'));
+        fprintf('[ID:%03d] GoalPos 5: %03d  PresPos:%03d\n', DXL_ID_5, dxl_goal_position(index), typecast(uint32(dxl_present_position_5), 'int32'));
+
+        if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
+            break;
+        end
+        if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position_2), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
+            break;
+        end
+        if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position_3), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
+            break;
+        end
+        if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position_4), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
+            break;
+        end
+        if ~(abs(dxl_goal_position(index) - typecast(uint32(dxl_present_position_5), 'int32')) > DXL_MOVING_STATUS_THRESHOLD)
+            break;
         end
     end
 end
@@ -324,4 +248,7 @@ function task2()
         end
     end
 end
+
+
+
 
