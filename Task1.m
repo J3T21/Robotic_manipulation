@@ -1,7 +1,7 @@
 close all;
 % Example usage
 %theta_o = asin(0.024/0.130); % offset link angle
-
+%open 2000 closed on block 2350 
 %%% Forward kinematic simulation 
 %{
 theta1 = [-pi/2:0.01:pi/2, pi/2:-0.01:0,zeros(1,777)]; % Joint 1 angle in rads
@@ -11,41 +11,42 @@ theta4 = [zeros(1,441),0:0.01:1.8837,1.8837:-0.01:-2.15 , -2.15:0.01:0];
 plot_OpenManipX(theta1, theta2, theta3, theta4,0);
 %}
 %%% Backwards kinematic simuation 
-%{
+
 %%% xy-plane
-angles_xy=[choose_kinematic(inverse_kinematic(0.2,-0.2,0)); 
-        choose_kinematic(inverse_kinematic(0.3,-0.2,0));
-        choose_kinematic(inverse_kinematic(0.3,-0.1,0));
-        choose_kinematic(inverse_kinematic(0.2,-0.1,0));
-        choose_kinematic(inverse_kinematic(0.2,-0.2,0))];
+angles_xy=[choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2)); 
+        choose_kinematic(inverse_kinematic(0.2,-0.1,0,-pi/2));
+        choose_kinematic(inverse_kinematic(0.2,-0.0,0,-pi/2));
+        choose_kinematic(inverse_kinematic(0.1,-0.0,0,-pi/2));
+        choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2))];
 plot_OpenManipX(angles_xy(:,1), angles_xy(:,2), angles_xy(:,3), angles_xy(:,4),1);
 %%% xz-plane
-angles_xz=[choose_kinematic(inverse_kinematic(0.2,0,0)); 
-        choose_kinematic(inverse_kinematic(0.3,0,0));
-        choose_kinematic(inverse_kinematic(0.3,0,0.1));
-        choose_kinematic(inverse_kinematic(0.2,0,0.1));
-        choose_kinematic(inverse_kinematic(0.2,0,0))];
+angles_xz=[choose_kinematic(inverse_kinematic(0.05,0,0,-pi/2)); 
+        choose_kinematic(inverse_kinematic(0.15,0,0,-pi/2));
+        choose_kinematic(inverse_kinematic(0.15,0,0.1,-pi/2));
+        choose_kinematic(inverse_kinematic(0.05,0,0.1,-pi/2));
+        choose_kinematic(inverse_kinematic(0.05,0,0,-pi/2))];
 plot_OpenManipX(angles_xz(:,1), angles_xz(:,2), angles_xz(:,3), angles_xz(:,4),1);
 %%% yz-plane
-angles_yz=[choose_kinematic(inverse_kinematic(0,-0.2,0)); 
-        choose_kinematic(inverse_kinematic(0,-0.3,0));
-        choose_kinematic(inverse_kinematic(0,-0.3,0.1));
-        choose_kinematic(inverse_kinematic(0,-0.2,0.1));
-        choose_kinematic(inverse_kinematic(0,-0.2,0))];
+angles_yz=[choose_kinematic(inverse_kinematic(0,-0.05,0,-pi/2)); 
+        choose_kinematic(inverse_kinematic(0,-0.15,0,-pi/2));
+        choose_kinematic(inverse_kinematic(0,-0.15,0.1,-pi/2));
+        choose_kinematic(inverse_kinematic(0,-0.05,0.1,-pi/2));
+        choose_kinematic(inverse_kinematic(0,-0.05,0,-pi/2))];
 plot_OpenManipX(angles_yz(:,1), angles_yz(:,2), angles_yz(:,3), angles_yz(:,4),1);
 %}
-x=choose_kinematic(inverse_kinematic(0.225,0,0.02));
-j1=rad_to_j1(x(1))
-j2=rad_to_j2(x(2))
-j3=rad_to_j3(x(3))
-j4=rad_to_j4(x(4))
-plot_OpenManipX(x(1),x(2),x(3),x(4),0)
-x2=choose_kinematic(inverse_kinematic(0.15,0.15,0.02));
-j1=rad_to_j1(x2(1))
-j2=rad_to_j2(x2(2))
-j3=rad_to_j3(x2(3))
-j4=rad_to_j4(x2(4))
-plot_OpenManipX(x2(1),x2(2),x2(3),x2(4),0)
+% x=inverse_kinematic(0.225,0,0.02);
+% j1=rad_to_j1(x(1))
+% j2=rad_to_j2(x(2))
+% j3=rad_to_j3(x(3))
+% j4=rad_to_j4(x(4))
+% plot_OpenManipX(x(1,1),x(1,2),x(1,3),x(1,4),0)
+% plot_OpenManipX(x(2,1),x(2,2),x(2,3),x(2,4),0)
+% x2=choose_kinematic(inverse_kinematic(0.1,0.15,0.02));
+% j1=rad_to_j1(x2(1))
+% j2=rad_to_j2(x2(2))
+% j3=rad_to_j3(x2(3))
+% j4=rad_to_j4(x2(4))
+% plot_OpenManipX(x2(1),x2(2),x2(3),x2(4),0)
 %plot_OpenManipX(x2(2,1),x2(2,2),x2(2,3),x2(2,4),0)
 function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
@@ -158,28 +159,27 @@ function IK_final = choose_kinematic(joint_angles)
     end
 end
 
-function IK = inverse_kinematic(x_ef,y_ef,z_ef)
+function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
     theta_o = asin(0.024/0.130);
     z_ef=z_ef-0.077;
-    theta1 = atan(y_ef/x_ef);
+    theta1 = atan2(y_ef,x_ef);
     r_ef = sqrt(x_ef^2+y_ef^2);
-    phi = atan(z_ef/r_ef);
     r_2 = r_ef-0.126*cos(phi);
     z_2 = z_ef-0.126*sin(phi);
     theta3_plus = acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
     theta3_minus = -acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
     costheta2_plus = (r_2*(0.13+0.124*cos(theta3_plus))+z_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
     costheta2_minus = (r_2*(0.13+0.124*cos(theta3_minus))+z_2*0.124*sin(theta3_minus))/(r_2^2+z_2^2);
-    %sintheta2_plus = (z_2*(0.13+0.124*cos(theta3_plus))+r_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
-    %sintheta2_minus = (z_2*(0.13+0.124*cos(theta3_minus))+r_2*0.124*sin(theta3_minus))/(r_2^2+z_2^2);
     sintheta2_plus = -sqrt(1-costheta2_plus^2)
     sintheta2_minus = sqrt(1-costheta2_minus^2)
-    theta2_plus = atan(sintheta2_plus/costheta2_plus)
-    theta2_minus = atan(sintheta2_minus/costheta2_minus)
+    theta2_plus = atan2(sintheta2_plus,costheta2_plus)
+    theta2_minus = atan2(sintheta2_minus,costheta2_minus)
     theta4_plus = phi-theta2_plus-theta3_plus
     theta4_minus = phi-theta2_minus-theta3_minus
     IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
 end
+
+%function IK = inverse_kinematic_2(x_ef, y_ef, z_ef)
 
 function encoder1 = rad_to_j1(theta1)
     encoder1=2048+rads_to_steps(theta1);
