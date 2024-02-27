@@ -139,7 +139,7 @@ write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 1);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 1);
 % TODO: Make the things above into a function
 % move function
-position1 = inverse_kinematic(0.075,-0.2,0.25-pi/2);
+position1 = inverse_kinematic(0.075,-0.2,0.025,-pi/2);
 position1_kinematic = choose_kinematic(position1);
 encoder1 = rad_to_j1(position1_kinematic(1));
 encoder2 = rad_to_j2(position1_kinematic(2));
@@ -150,7 +150,7 @@ encoder4 = rad_to_j4(position1_kinematic(4));
 move(encoder1,encoder2,encoder3,encoder4,2000);
 move(encoder1,encoder2,encoder3,encoder4,800);
 
-position2 = inverse_kinematic(0.125,-0.125,0.25-pi/2);
+position2 = inverse_kinematic(0.125,-0.125,0.025,-pi/2);
 position2_kinematic = choose_kinematic(position2);
 encoder1 = rad_to_j1(position2_kinematic(1));
 encoder2 = rad_to_j2(position2_kinematic(2));
