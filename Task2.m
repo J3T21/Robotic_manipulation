@@ -278,3 +278,6 @@ function steps = rads_to_steps(rads)
     step = (2*pi)/4096;
     steps = rads/step;
 end
+function coords = coords_to_meters(x,y,z)
+    coords = [x*0.025, y*0.025, z/10];
+end
