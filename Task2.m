@@ -39,7 +39,7 @@ DXL_ID_3                     = 13;            % Dynamixel ID: 3
 DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
-DEVICENAME                  = '/dev/cu.usbserial-FT5WJ7EO';       % Check which port is being used on your controller
+DEVICENAME                  = '/dev/tty.usbserial-FT5WJ7EO';       % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
                                             
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -127,10 +127,10 @@ write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_OPERATING_MODE, 3)
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_OPERATING_MODE, 3);
 % limit speed so it doesnt spaz
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_VELOCITY, 700);
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_VELOCITY, 700);
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_VELOCITY, 700);
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_VELOCITY, 700);
-write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_VELOCITY, 700);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_VELOCITY, 1000);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_VELOCITY, 1300);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_VELOCITY, 1000);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_VELOCITY, 1500);
 % enable tourque
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 1);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 1);
@@ -139,30 +139,53 @@ write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 1);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 1);
 % TODO: Make the things above into a function
 % move function
-position1 = inverse_kinematic(0.075,-0.2,0.025,-pi/2);
+move(2000,2000,2000,2000,2000);
+position1 = inverse_kinematic(0.075,-0.2,0.055,-pi/2);
 position1_kinematic = choose_kinematic(position1);
 encoder1 = rad_to_j1(position1_kinematic(1));
 encoder2 = rad_to_j2(position1_kinematic(2));
 encoder3 = rad_to_j3(position1_kinematic(3));
 encoder4 = rad_to_j4(position1_kinematic(4));
-
-
+pause(1);
 move(encoder1,encoder2,encoder3,encoder4,2000);
+pause(0.2);
 move(encoder1,encoder2,encoder3,encoder4,3000);
 
-position2 = inverse_kinematic(0.125,-0.125,0.025,-pi/2);
+position1 = inverse_kinematic(0.075,-0.2,0.1,0);
+position1_kinematic = choose_kinematic(position1);
+encoder1 = rad_to_j1(position1_kinematic(1));
+encoder2 = rad_to_j2(position1_kinematic(2));
+encoder3 = rad_to_j3(position1_kinematic(3));
+encoder4 = rad_to_j4(position1_kinematic(4));
+pause(1);
+move(encoder1,encoder2,encoder3,encoder4,3000);
+
+position1 = inverse_kinematic(0.1,-0.125,0.08,-pi/2);
+position1_kinematic = choose_kinematic(position1);
+encoder1 = rad_to_j1(position1_kinematic(1));
+encoder2 = rad_to_j2(position1_kinematic(2));
+encoder3 = rad_to_j3(position1_kinematic(3));
+encoder4 = rad_to_j4(position1_kinematic(4));
+pause(1);
+move(encoder1,encoder2,encoder3,encoder4,3000);
+
+position2 = inverse_kinematic(0.125,-0.125,0.055,0);
 position2_kinematic = choose_kinematic(position2);
 encoder1 = rad_to_j1(position2_kinematic(1));
 encoder2 = rad_to_j2(position2_kinematic(2));
 encoder3 = rad_to_j3(position2_kinematic(3));
 encoder4 = rad_to_j4(position2_kinematic(4));
+pause(1);
 move(encoder1,encoder2,encoder3,encoder4,3000);
+pause(0.2);
 move(encoder1,encoder2,encoder3,encoder4,2000);
 
 
 %%% xy-plane
 
 % Disable Dynamixel Torque
+% move(2000,2000,2000,2000,2000);
+% move(2000,750,3000,2400,2000);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 0);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 0);
 write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 0);
@@ -195,15 +218,15 @@ function move(encoder1,encoder2,encoder3,encoder4,encoder5)
     
     % Write goal position
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_POSITION, encoder5);
-    pause(2);
+    % pause(0.2);
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_POSITION, encoder1);
-    pause(2);
+    % pause(0.2);
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_POSITION, encoder4);
-    pause(2);
+    % pause(0.2);
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_POSITION, encoder3);
-    pause(2);
+    % pause(0.2);
     write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, encoder2);
-    pause(2);
+    pause(1);
     
         
 
@@ -277,7 +300,4 @@ end
 function steps = rads_to_steps(rads)
     step = (2*pi)/4096;
     steps = rads/step;
-end
-function coords = coords_to_meters(x,y,z)
-    coords = [x*0.025, y*0.025, z/10];
 end
