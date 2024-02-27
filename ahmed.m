@@ -24,7 +24,7 @@ function plot_OpenManipX(theta1, theta2, theta3, theta4)
     % Plot links
     %base = [0; 0; 0; 1]; % Changed to column vector
    
-
+    %test to add branch
     
     T0_1 = Ti( DH(1,:));
     T1_2 = Ti( DH(2,:));
