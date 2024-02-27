@@ -5,15 +5,15 @@ clear all;
 lib_name = '';
 
 if strcmp(computer, 'PCWIN')
-  lib_name = 'dxl_x86_c';
+    lib_name = 'dxl_x86_c';
 elseif strcmp(computer, 'PCWIN64')
-  lib_name = 'dxl_x64_c';
+    lib_name = 'dxl_x64_c';
 elseif strcmp(computer, 'GLNX86')
-  lib_name = 'libdxl_x86_c';
+    lib_name = 'libdxl_x86_c';
 elseif strcmp(computer, 'GLNXA64')
-  lib_name = 'libdxl_x64_c';
+    lib_name = 'libdxl_x64_c';
 elseif strcmp(computer, 'MACI64')
-  lib_name = 'libdxl_mac_c';
+    lib_name = 'libdxl_mac_c';
 end
 if ~libisloaded(lib_name)
     [notfound, warnings] = loadlibrary(lib_name, 'dynamixel_sdk.h', 'addheader', 'port_handler.h', 'addheader', 'packet_handler.h');
@@ -22,8 +22,8 @@ end
 %% ---- Control Table Addresses ---- %%
 
 ADDR_PRO_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
-ADDR_PRO_GOAL_POSITION       = 116; 
-ADDR_PRO_PRESENT_POSITION    = 132; 
+ADDR_PRO_GOAL_POSITION       = 116;
+ADDR_PRO_PRESENT_POSITION    = 132;
 ADDR_PRO_OPERATING_MODE      = 11;
 ADDR_PRO_GOAL_VELOCITY       = 112;
 
@@ -40,8 +40,8 @@ DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
 DEVICENAME                  = '/dev/tty.usbserial-FT5WJ7EO';       % Check which port is being used on your controller
-                                            % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
-                                            
+% ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
+
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
 TORQUE_DISABLE              = 0;            % Value for disabling the torque
 DXL_MINIMUM_POSITION_VALUE  = 0;      % Dynamixel will rotate between this value
@@ -120,23 +120,26 @@ end
 % enter move function here depending on the position of the dynamixel
 
 % set to control mode
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_OPERATING_MODE, 3);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_OPERATING_MODE, 3);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_OPERATING_MODE, 3);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_OPERATING_MODE, 3);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_OPERATING_MODE, 3);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_OPERATING_MODE, 3);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_OPERATING_MODE, 3);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_OPERATING_MODE, 3);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_OPERATING_MODE, 3);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_OPERATING_MODE, 3);
+command(1,ADDR_PRO_OPERATING_MODE,3);
 % limit speed so it doesnt spaz
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_VELOCITY, 700);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_VELOCITY, 1000);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_VELOCITY, 1300);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_VELOCITY, 1000);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_VELOCITY, 1500);
+
 % enable tourque
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 1);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 1);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 1);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 1);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 1);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 1);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 1);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 1);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 1);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 1);
+command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % TODO: Make the things above into a function
 % move function
 move(2000,2000,2000,2000,2000);
@@ -185,12 +188,13 @@ move(encoder1,encoder2,encoder3,encoder4,2000);
 
 % Disable Dynamixel Torque
 % move(2000,2000,2000,2000,2000);
-% move(2000,750,3000,2400,2000);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 0);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 0);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 0);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 0);
-write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 0);
+
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 0);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 0);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 0);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 0);
+% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 0);
+command(1,ADDR_PRO_TORQUE_ENABLE,0);
 % Close port
 closePort(port_num);
 fprintf('Port Closed \n');
@@ -203,101 +207,122 @@ close all;
 clear all;
 
 function move(encoder1,encoder2,encoder3,encoder4,encoder5)
-    global port_num;
-    ADDR_PRO_GOAL_POSITION       = 116; 
-    PROTOCOL_VERSION            = 2.0; 
+global port_num;
+ADDR_PRO_GOAL_POSITION       = 116;
+PROTOCOL_VERSION            = 2.0;
 
-    DXL_ID                      = 11;            % Dynamixel ID: 1
-    DXL_ID_2                      = 12;            % Dynamixel ID: 2
-    DXL_ID_3                     = 13;            % Dynamixel ID: 3
-    DXL_ID_4                      = 14;            % Dynamixel ID: 4
-    DXL_ID_5                      = 15;   
+DXL_ID                      = 11;            % Dynamixel ID: 1
+DXL_ID_2                      = 12;            % Dynamixel ID: 2
+DXL_ID_3                     = 13;            % Dynamixel ID: 3
+DXL_ID_4                      = 14;            % Dynamixel ID: 4
+DXL_ID_5                      = 15;
 
-  
-   
-    
-    % Write goal position
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_POSITION, encoder5);
-    % pause(0.2);
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_POSITION, encoder1);
-    % pause(0.2);
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_POSITION, encoder4);
-    % pause(0.2);
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_POSITION, encoder3);
-    % pause(0.2);
-    write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, encoder2);
-    pause(1);
-    
-        
+
+
+
+% Write goal position
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_POSITION, encoder5);
+% pause(0.2);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_GOAL_POSITION, encoder1);
+% pause(0.2);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_POSITION, encoder4);
+% pause(0.2);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_POSITION, encoder3);
+% pause(0.2);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, encoder2);
+pause(1);
+
+
 
 end
 
 function IK_final = choose_kinematic(joint_angles)
-    j1=rad_to_j1(joint_angles(1,1));
-    j2=rad_to_j2(joint_angles(1,2)); 
-    j3=rad_to_j3(joint_angles(1,3));
-    j4=rad_to_j4(joint_angles(1,4));
-    if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(1,:)))
-        %warning('IK using positive cosine component out of range')
-        j1=rad_to_j1(joint_angles(2,1));
-        j2=rad_to_j2(joint_angles(2,2)); 
-        j3=rad_to_j3(joint_angles(2,3));
-        j4=rad_to_j4(joint_angles(2,4));
-        if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(2,:)))
-            error('Joint angles are out of range for both IK solvers');
-        else
-            IK_final = joint_angles(2,:);
-        end
+j1=rad_to_j1(joint_angles(1,1));
+j2=rad_to_j2(joint_angles(1,2));
+j3=rad_to_j3(joint_angles(1,3));
+j4=rad_to_j4(joint_angles(1,4));
+if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(1,:)))
+    %warning('IK using positive cosine component out of range')
+    j1=rad_to_j1(joint_angles(2,1));
+    j2=rad_to_j2(joint_angles(2,2));
+    j3=rad_to_j3(joint_angles(2,3));
+    j4=rad_to_j4(joint_angles(2,4));
+    if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(2,:)))
+        error('Joint angles are out of range for both IK solvers');
     else
-        IK_final = joint_angles(1,:);
+        IK_final = joint_angles(2,:);
     end
+else
+    IK_final = joint_angles(1,:);
+end
 end
 
 function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
-    theta_o = asin(0.024/0.130);
-    z_ef=z_ef-0.077;
-    theta1 = atan2(y_ef,x_ef);
-    r_ef = sqrt(x_ef^2+y_ef^2);
-    r_2 = r_ef-0.126*cos(phi);
-    z_2 = z_ef-0.126*sin(phi);
-    theta3_plus = acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
-    theta3_minus = -acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
-    costheta2_plus = (r_2*(0.13+0.124*cos(theta3_plus))+z_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
-    costheta2_minus = (r_2*(0.13+0.124*cos(theta3_minus))+z_2*0.124*sin(theta3_minus))/(r_2^2+z_2^2);
-    sintheta2_plus = -sqrt(1-costheta2_plus^2)
-    sintheta2_minus = sqrt(1-costheta2_minus^2)
-    theta2_plus = atan2(sintheta2_plus,costheta2_plus)
-    theta2_minus = atan2(sintheta2_minus,costheta2_minus)
-    theta4_plus = phi-theta2_plus-theta3_plus
-    theta4_minus = phi-theta2_minus-theta3_minus
-    IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
+theta_o = asin(0.024/0.130);
+z_ef=z_ef-0.077;
+theta1 = atan2(y_ef,x_ef);
+r_ef = sqrt(x_ef^2+y_ef^2);
+r_2 = r_ef-0.126*cos(phi);
+z_2 = z_ef-0.126*sin(phi);
+theta3_plus = acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
+theta3_minus = -acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
+costheta2_plus = (r_2*(0.13+0.124*cos(theta3_plus))+z_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
+costheta2_minus = (r_2*(0.13+0.124*cos(theta3_minus))+z_2*0.124*sin(theta3_minus))/(r_2^2+z_2^2);
+sintheta2_plus = -sqrt(1-costheta2_plus^2)
+sintheta2_minus = sqrt(1-costheta2_minus^2)
+theta2_plus = atan2(sintheta2_plus,costheta2_plus)
+theta2_minus = atan2(sintheta2_minus,costheta2_minus)
+theta4_plus = phi-theta2_plus-theta3_plus
+theta4_minus = phi-theta2_minus-theta3_minus
+IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
 end
 
 %function IK = inverse_kinematic_2(x_ef, y_ef, z_ef)
 
 function encoder1 = rad_to_j1(theta1)
-    encoder1=2048+rads_to_steps(theta1);
+encoder1=2048+rads_to_steps(theta1);
 end
 
 function encoder2 = rad_to_j2(theta2)
-    encoder2=3072-rads_to_steps(theta2);
-    % if (encoder2 < 760) || (encoder2 > 3290)
-    %     warning('Joint 2 angle is out of range');
-    % end
+encoder2=3072-rads_to_steps(theta2);
+% if (encoder2 < 760) || (encoder2 > 3290)
+%     warning('Joint 2 angle is out of range');
+% end
 end
 function encoder3 = rad_to_j3(theta3)
-    encoder3=1024-rads_to_steps(theta3);
-    % if (encoder3 < 695) || (encoder3 > 3060)
-    %     warning('Joint 3 angle is out of range');
-    % end
+encoder3=1024-rads_to_steps(theta3);
+% if (encoder3 < 695) || (encoder3 > 3060)
+%     warning('Joint 3 angle is out of range');
+% end
 end
 function encoder4 = rad_to_j4(theta4)
-    encoder4=2048-rads_to_steps(theta4);
-    % if (encoder4 < 820) || (encoder4 > 3450)
-    %     warning('Joint 4 angle is out of range');
-    % end
+encoder4=2048-rads_to_steps(theta4);
+% if (encoder4 < 820) || (encoder4 > 3450)
+%     warning('Joint 4 angle is out of range');
+% end
 end
 function steps = rads_to_steps(rads)
-    step = (2*pi)/4096;
-    steps = rads/step;
+step = (2*pi)/4096;
+steps = rads/step;
+end
+function command(bytes,register,value)
+global port_num;
+DXL_ID                      = 11;            % Dynamixel ID: 1
+DXL_ID_2                      = 12;            % Dynamixel ID: 2
+DXL_ID_3                     = 13;            % Dynamixel ID: 3
+DXL_ID_4                      = 14;            % Dynamixel ID: 4
+DXL_ID_5                      = 15;
+if bytes == 1
+    write1ByteTxRx(port_num, 2, DXL_ID, register, value);
+    write1ByteTxRx(port_num, 2, DXL_ID_2, register, value);
+    write1ByteTxRx(port_num, 2, DXL_ID_3, register, value);
+    write1ByteTxRx(port_num, 2, DXL_ID_4, register, value);
+    write1ByteTxRx(port_num, 2, DXL_ID_5, register, value);
+else
+    write4ByteTxRx(port_num, 2, DXL_ID, register, value);
+    write4ByteTxRx(port_num, 2, DXL_ID_2, register, value);
+    write4ByteTxRx(port_num, 2, DXL_ID_3, register, value);
+    write4ByteTxRx(port_num, 2, DXL_ID_4, register, value);
+    write4ByteTxRx(port_num, 2, DXL_ID_5, register, value);
+end
 end
