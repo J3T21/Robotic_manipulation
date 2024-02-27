@@ -1,57 +1,31 @@
 close all;
-% Example usage
-%theta_o = asin(0.024/0.130); % offset link angle
-%open 2000 closed on block 2350 
-%%% Forward kinematic simulation 
-%{
-theta1 = [-pi/2:0.01:pi/2, pi/2:-0.01:0,zeros(1,777)]; % Joint 1 angle in rads
-theta2 = [zeros(1,473),0:-0.01:-0.33,-0.33:0.01:3.54,3.54:-0.01:0];
-theta3 = [zeros(1,473),0:0.01:0.504, 0.504:-0.01:-3.12 , -3.12:0.01:0 , zeros(1,50)];
-theta4 = [zeros(1,441),0:0.01:1.8837,1.8837:-0.01:-2.15 , -2.15:0.01:0];
-plot_OpenManipX(theta1, theta2, theta3, theta4,0);
-%}
-%%% Backwards kinematic simuation 
-
 %%% xy-plane
 angles_xy=[choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2)); 
         choose_kinematic(inverse_kinematic(0.2,-0.1,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.2,-0.0,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.1,-0.0,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2))];
-%plot_OpenManipX(angles_xy(:,1), angles_xy(:,2), angles_xy(:,3), angles_xy(:,4),1);
+plot_OpenManipX(angles_xy(:,1), angles_xy(:,2), angles_xy(:,3), angles_xy(:,4),1);
 %%% xz-plane
 angles_xz=[choose_kinematic(inverse_kinematic(0.05,0,0,-pi/2)); 
         choose_kinematic(inverse_kinematic(0.15,0,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.15,0,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0.05,0,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0.05,0,0,-pi/2))];
-%plot_OpenManipX(angles_xz(:,1), angles_xz(:,2), angles_xz(:,3), angles_xz(:,4),1);
+plot_OpenManipX(angles_xz(:,1), angles_xz(:,2), angles_xz(:,3), angles_xz(:,4),1);
 %%% yz-plane
 angles_yz=[choose_kinematic(inverse_kinematic(0,-0.05,0,-pi/2)); 
         choose_kinematic(inverse_kinematic(0,-0.15,0,-pi/2));
         choose_kinematic(inverse_kinematic(0,-0.15,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0,-0.05,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0,-0.05,0,-pi/2))];
-%plot_OpenManipX(angles_yz(:,1), angles_yz(:,2), angles_yz(:,3), angles_yz(:,4),1);
+plot_OpenManipX(angles_yz(:,1), angles_yz(:,2), angles_yz(:,3), angles_yz(:,4),1);
 
 position2 = inverse_kinematic(0.075,-0.2,0.025,-pi/2);
 position2_kinematic = choose_kinematic(position2);
 plot_OpenManipX(position2_kinematic(1),position2_kinematic(2),position2_kinematic(3),position2_kinematic(4),0);
 %}
-% x=inverse_kinematic(0.225,0,0.02);
-% j1=rad_to_j1(x(1))
-% j2=rad_to_j2(x(2))
-% j3=rad_to_j3(x(3))
-% j4=rad_to_j4(x(4))
-% plot_OpenManipX(x(1,1),x(1,2),x(1,3),x(1,4),0)
-% plot_OpenManipX(x(2,1),x(2,2),x(2,3),x(2,4),0)
-% x2=choose_kinematic(inverse_kinematic(0.1,0.15,0.02));
-% j1=rad_to_j1(x2(1))
-% j2=rad_to_j2(x2(2))
-% j3=rad_to_j3(x2(3))
-% j4=rad_to_j4(x2(4))
-% plot_OpenManipX(x2(1),x2(2),x2(3),x2(4),0)
-%plot_OpenManipX(x2(2,1),x2(2,2),x2(2,3),x2(2,4),0)
+
 function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
     % alpha a d theta (degrees)
@@ -127,13 +101,7 @@ function T = transformation_matrix(alpha, a, d, theta)
         0 0 0 1];
 end
 
-function T = transformation_matrix_craig(alpha, a, d, theta)
-    % Calculate DH transformation matrix
-    T = [cos(theta) -sin(theta)  0 a;
-        sin(theta)*cos(alpha) cos(theta)*cos(alpha) -sin(alpha) -sin(alpha)*d;
-        sin(theta)*sin(alpha) cos(theta)*sin(alpha) cos(alpha) cos(alpha)*d;
-        0 0 0 1];
-end
+
 
 function DH = DH_table(theta1, theta2, theta3, theta4)
     % alpha a d theta (radians)
@@ -186,29 +154,21 @@ function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
     IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
 end
 
-%function IK = inverse_kinematic_2(x_ef, y_ef, z_ef)
-
 function encoder1 = rad_to_j1(theta1)
     encoder1=2048+rads_to_steps(theta1);
 end
 
 function encoder2 = rad_to_j2(theta2)
     encoder2=3072-rads_to_steps(theta2);
-    % if (encoder2 < 760) || (encoder2 > 3290)
-    %     warning('Joint 2 angle is out of range');
-    % end
+
 end
 function encoder3 = rad_to_j3(theta3)
     encoder3=1024-rads_to_steps(theta3);
-    % if (encoder3 < 695) || (encoder3 > 3060)
-    %     warning('Joint 3 angle is out of range');
-    % end
+
 end
 function encoder4 = rad_to_j4(theta4)
     encoder4=2048-rads_to_steps(theta4);
-    % if (encoder4 < 820) || (encoder4 > 3450)
-    %     warning('Joint 4 angle is out of range');
-    % end
+
 end
 function steps = rads_to_steps(rads)
     step = (2*pi)/4096;
