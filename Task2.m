@@ -148,7 +148,7 @@ encoder4 = rad_to_j4(position1_kinematic(4));
 
 
 move(encoder1,encoder2,encoder3,encoder4,2000);
-move(encoder1,encoder2,encoder3,encoder4,800);
+move(encoder1,encoder2,encoder3,encoder4,3000);
 
 position2 = inverse_kinematic(0.125,-0.125,0.025,-pi/2);
 position2_kinematic = choose_kinematic(position2);
@@ -156,7 +156,7 @@ encoder1 = rad_to_j1(position2_kinematic(1));
 encoder2 = rad_to_j2(position2_kinematic(2));
 encoder3 = rad_to_j3(position2_kinematic(3));
 encoder4 = rad_to_j4(position2_kinematic(4));
-move(encoder1,encoder2,encoder3,encoder4,800);
+move(encoder1,encoder2,encoder3,encoder4,3000);
 move(encoder1,encoder2,encoder3,encoder4,2000);
 
 

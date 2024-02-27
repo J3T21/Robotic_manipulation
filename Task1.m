@@ -18,21 +18,25 @@ angles_xy=[choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.2,-0.0,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.1,-0.0,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2))];
-plot_OpenManipX(angles_xy(:,1), angles_xy(:,2), angles_xy(:,3), angles_xy(:,4),1);
+%plot_OpenManipX(angles_xy(:,1), angles_xy(:,2), angles_xy(:,3), angles_xy(:,4),1);
 %%% xz-plane
 angles_xz=[choose_kinematic(inverse_kinematic(0.05,0,0,-pi/2)); 
         choose_kinematic(inverse_kinematic(0.15,0,0,-pi/2));
         choose_kinematic(inverse_kinematic(0.15,0,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0.05,0,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0.05,0,0,-pi/2))];
-plot_OpenManipX(angles_xz(:,1), angles_xz(:,2), angles_xz(:,3), angles_xz(:,4),1);
+%plot_OpenManipX(angles_xz(:,1), angles_xz(:,2), angles_xz(:,3), angles_xz(:,4),1);
 %%% yz-plane
 angles_yz=[choose_kinematic(inverse_kinematic(0,-0.05,0,-pi/2)); 
         choose_kinematic(inverse_kinematic(0,-0.15,0,-pi/2));
         choose_kinematic(inverse_kinematic(0,-0.15,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0,-0.05,0.1,-pi/2));
         choose_kinematic(inverse_kinematic(0,-0.05,0,-pi/2))];
-plot_OpenManipX(angles_yz(:,1), angles_yz(:,2), angles_yz(:,3), angles_yz(:,4),1);
+%plot_OpenManipX(angles_yz(:,1), angles_yz(:,2), angles_yz(:,3), angles_yz(:,4),1);
+
+position2 = inverse_kinematic(0.075,-0.2,0.025,-pi/2);
+position2_kinematic = choose_kinematic(position2);
+plot_OpenManipX(position2_kinematic(1),position2_kinematic(2),position2_kinematic(3),position2_kinematic(4),0);
 %}
 % x=inverse_kinematic(0.225,0,0.02);
 % j1=rad_to_j1(x(1))
@@ -53,7 +57,7 @@ function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % alpha a d theta (degrees)
     figure;
     set(gcf, 'Position', get(0, 'Screensize'));
-    colororder("glow12");
+    %colororder("glow12");
     if length(theta1) ~= length(theta2) || length(theta2) ~= length(theta3) || length(theta3) ~= length(theta4)
         error('Input angle arrays must have the same length');
     end
