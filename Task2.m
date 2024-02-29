@@ -258,71 +258,77 @@ end
 end
 
 function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
-theta_o = asin(0.024/0.130);
-z_ef=z_ef-0.077;
-theta1 = atan2(y_ef,x_ef);
-r_ef = sqrt(x_ef^2+y_ef^2);
-r_2 = r_ef-0.126*cos(phi);
-z_2 = z_ef-0.126*sin(phi);
-theta3_plus = acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
-theta3_minus = -acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
-costheta2_plus = (r_2*(0.13+0.124*cos(theta3_plus))+z_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
-costheta2_minus = (r_2*(0.13+0.124*cos(theta3_minus))+z_2*0.124*sin(theta3_minus))/(r_2^2+z_2^2);
-sintheta2_plus = -sqrt(1-costheta2_plus^2)
-sintheta2_minus = sqrt(1-costheta2_minus^2)
-theta2_plus = atan2(sintheta2_plus,costheta2_plus)
-theta2_minus = atan2(sintheta2_minus,costheta2_minus)
-theta4_plus = phi-theta2_plus-theta3_plus
-theta4_minus = phi-theta2_minus-theta3_minus
-IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
+    theta_o = asin(0.024/0.130);
+    z_ef=z_ef-0.077;
+    theta1 = atan2(y_ef,x_ef);
+    r_ef = sqrt(x_ef^2+y_ef^2);
+    r_2 = r_ef-0.126*cos(phi);
+    z_2 = z_ef-0.126*sin(phi);
+    theta3_plus = acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
+    theta3_minus = -acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124))
+    costheta2_plus = (r_2*(0.13+0.124*cos(theta3_plus))+z_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
+    costheta2_minus = (r_2*(0.13+0.124*cos(theta3_minus))+z_2*0.124*sin(theta3_minus))/(r_2^2+z_2^2);
+    sintheta2_plus = -sqrt(1-costheta2_plus^2)
+    sintheta2_minus = sqrt(1-costheta2_minus^2)
+    theta2_plus = atan2(sintheta2_plus,costheta2_plus)
+    theta2_minus = atan2(sintheta2_minus,costheta2_minus)
+    theta4_plus = phi-theta2_plus-theta3_plus
+    theta4_minus = phi-theta2_minus-theta3_minus
+    IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
 end
 
 %function IK = inverse_kinematic_2(x_ef, y_ef, z_ef)
 
 function encoder1 = rad_to_j1(theta1)
-encoder1=2048+rads_to_steps(theta1);
+    encoder1=2048+rads_to_steps(theta1);
 end
 
 function encoder2 = rad_to_j2(theta2)
-encoder2=3072-rads_to_steps(theta2);
+    encoder2=3072-rads_to_steps(theta2);
 % if (encoder2 < 760) || (encoder2 > 3290)
 %     warning('Joint 2 angle is out of range');
 % end
 end
 function encoder3 = rad_to_j3(theta3)
-encoder3=1024-rads_to_steps(theta3);
+    encoder3=1024-rads_to_steps(theta3);
 % if (encoder3 < 695) || (encoder3 > 3060)
 %     warning('Joint 3 angle is out of range');
 % end
 end
 function encoder4 = rad_to_j4(theta4)
-encoder4=2048-rads_to_steps(theta4);
+    encoder4=2048-rads_to_steps(theta4);
 % if (encoder4 < 820) || (encoder4 > 3450)
 %     warning('Joint 4 angle is out of range');
 % end
 end
+
 function steps = rads_to_steps(rads)
-step = (2*pi)/4096;
-steps = rads/step;
+    step = (2*pi)/4096;
+    steps = rads/step;
 end
+
+function coords = coords_to_meters(x,y,z)
+    coords = [x*0.025, y*0.025, z/10];
+end
+
 function command(bytes,register,value)
-global port_num;
-DXL_ID                      = 11;            % Dynamixel ID: 1
-DXL_ID_2                      = 12;            % Dynamixel ID: 2
-DXL_ID_3                     = 13;            % Dynamixel ID: 3
-DXL_ID_4                      = 14;            % Dynamixel ID: 4
-DXL_ID_5                      = 15;
-if bytes == 1
-    write1ByteTxRx(port_num, 2, DXL_ID, register, value);
-    write1ByteTxRx(port_num, 2, DXL_ID_2, register, value);
-    write1ByteTxRx(port_num, 2, DXL_ID_3, register, value);
-    write1ByteTxRx(port_num, 2, DXL_ID_4, register, value);
-    write1ByteTxRx(port_num, 2, DXL_ID_5, register, value);
-else
-    write4ByteTxRx(port_num, 2, DXL_ID, register, value);
-    write4ByteTxRx(port_num, 2, DXL_ID_2, register, value);
-    write4ByteTxRx(port_num, 2, DXL_ID_3, register, value);
-    write4ByteTxRx(port_num, 2, DXL_ID_4, register, value);
-    write4ByteTxRx(port_num, 2, DXL_ID_5, register, value);
-end
+    global port_num;
+    DXL_ID                      = 11;            % Dynamixel ID: 1
+    DXL_ID_2                      = 12;            % Dynamixel ID: 2
+    DXL_ID_3                     = 13;            % Dynamixel ID: 3
+    DXL_ID_4                      = 14;            % Dynamixel ID: 4
+    DXL_ID_5                      = 15;
+    if bytes == 1
+        write1ByteTxRx(port_num, 2, DXL_ID, register, value);
+        write1ByteTxRx(port_num, 2, DXL_ID_2, register, value);
+        write1ByteTxRx(port_num, 2, DXL_ID_3, register, value);
+        write1ByteTxRx(port_num, 2, DXL_ID_4, register, value);
+        write1ByteTxRx(port_num, 2, DXL_ID_5, register, value);
+    else
+        write4ByteTxRx(port_num, 2, DXL_ID, register, value);
+        write4ByteTxRx(port_num, 2, DXL_ID_2, register, value);
+        write4ByteTxRx(port_num, 2, DXL_ID_3, register, value);
+        write4ByteTxRx(port_num, 2, DXL_ID_4, register, value);
+        write4ByteTxRx(port_num, 2, DXL_ID_5, register, value);
+    end
 end
