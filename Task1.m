@@ -1,4 +1,5 @@
 close all;
+%{
 %%% xy-plane
 angles_xy=[choose_kinematic(inverse_kinematic(0.1,-0.1,0,-pi/2)); 
         choose_kinematic(inverse_kinematic(0.2,-0.1,0,-pi/2));
@@ -25,6 +26,13 @@ position2 = inverse_kinematic(0.075,-0.2,0.025,-pi/2);
 position2_kinematic = choose_kinematic(position2);
 plot_OpenManipX(position2_kinematic(1),position2_kinematic(2),position2_kinematic(3),position2_kinematic(4),0);
 %}
+
+xyz = coords_to_meters(3,-8,0.07);
+position = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
+position_kinematic = choose_kinematic(position);
+plot_OpenManipX(position(1,1),position(1,2),position(1,3),position(1,4),0);
+plot_OpenManipX(position(2,1),position(2,2),position(2,3),position(2,4),0);
+plot_OpenManipX(position_kinematic(1),position_kinematic(2),position_kinematic(3),position_kinematic(4),0);
 
 function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
@@ -114,16 +122,17 @@ function DH = DH_table(theta1, theta2, theta3, theta4)
 end
 
 function IK_final = choose_kinematic(joint_angles)
-    j1=rad_to_j1(joint_angles(1,1));
-    j2=rad_to_j2(joint_angles(1,2)); 
-    j3=rad_to_j3(joint_angles(1,3));
-    j4=rad_to_j4(joint_angles(1,4));
+    j1=rad_to_j1(joint_angles(2,1));
+    j2=rad_to_j2(joint_angles(2,2)); 
+    j3=rad_to_j3(joint_angles(2,3));
+    j4=rad_to_j4(joint_angles(2,4));
+    
     if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(1,:)))
         %warning('IK using positive cosine component out of range')
-        j1=rad_to_j1(joint_angles(2,1));
-        j2=rad_to_j2(joint_angles(2,2)); 
-        j3=rad_to_j3(joint_angles(2,3));
-        j4=rad_to_j4(joint_angles(2,4));
+        j1=rad_to_j1(joint_angles(1,1));
+        j2=rad_to_j2(joint_angles(1,2)); 
+        j3=rad_to_j3(joint_angles(1,3));
+        j4=rad_to_j4(joint_angles(1,4));
         if (j2 < 760) || (j2 > 3290) || (j3 < 695) || (j3 > 3060) || (j4 < 820) || (j4 > 3450) || any(isnan(joint_angles(2,:)))
             error('Joint angles are out of range for both IK solvers');
         else
@@ -173,4 +182,7 @@ end
 function steps = rads_to_steps(rads)
     step = (2*pi)/4096;
     steps = rads/step;
+end
+function coords = coords_to_meters(x,y,z)
+    coords = [x*0.025, y*0.025, z];
 end

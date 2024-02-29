@@ -39,7 +39,7 @@ DXL_ID_3                     = 13;            % Dynamixel ID: 3
 DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
-DEVICENAME                  = '/dev/tty.usbserial-FT5WJ7EO';       % Check which port is being used on your controller
+DEVICENAME                  = 'COM8';       % Check which port is being used on your controller
 % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -142,48 +142,62 @@ write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_VELOCITY, 150
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % TODO: Make the things above into a function
 % move function
-move(2000,2000,2000,2000,2000);
-position1 = inverse_kinematic(0.075,-0.2,0.055,-pi/2);
+block_height=0.07;
+intermediate_height=0.1;
+%moving block 1
+%initialize
+move(2000,2000,2000,2000,2250);
+xyz = coords_to_meters(3,-8,block_height);
+disp(xyz)
+position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/1.9);
 position1_kinematic = choose_kinematic(position1);
 encoder1 = rad_to_j1(position1_kinematic(1));
 encoder2 = rad_to_j2(position1_kinematic(2));
 encoder3 = rad_to_j3(position1_kinematic(3));
 encoder4 = rad_to_j4(position1_kinematic(4));
-pause(1);
+plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
+%pause(1);
+%move to block 1
 move(encoder1,encoder2,encoder3,encoder4,2000);
-pause(0.2);
-move(encoder1,encoder2,encoder3,encoder4,3000);
+%pause(0.2);
+%close the mouth
+move(encoder1,encoder2,encoder3,encoder4,2250);
 
-position1 = inverse_kinematic(0.075,-0.2,0.1,0);
+%intermiediate steps
+xyz = coords_to_meters(3,-8,intermediate_height);
+disp(xyz)
+position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/3);
 position1_kinematic = choose_kinematic(position1);
 encoder1 = rad_to_j1(position1_kinematic(1));
 encoder2 = rad_to_j2(position1_kinematic(2));
 encoder3 = rad_to_j3(position1_kinematic(3));
 encoder4 = rad_to_j4(position1_kinematic(4));
-pause(1);
-move(encoder1,encoder2,encoder3,encoder4,3000);
+plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
+move(encoder1,encoder2,encoder3,encoder4,2250);
 
-position1 = inverse_kinematic(0.1,-0.125,0.08,-pi/2);
+xyz = coords_to_meters(5,-8,intermediate_height);
+disp(xyz)
+position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/3);
 position1_kinematic = choose_kinematic(position1);
 encoder1 = rad_to_j1(position1_kinematic(1));
 encoder2 = rad_to_j2(position1_kinematic(2));
 encoder3 = rad_to_j3(position1_kinematic(3));
 encoder4 = rad_to_j4(position1_kinematic(4));
-pause(1);
-move(encoder1,encoder2,encoder3,encoder4,3000);
+plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
+move(encoder1,encoder2,encoder3,encoder4,2250);
 
-position2 = inverse_kinematic(0.125,-0.125,0.055,0);
-position2_kinematic = choose_kinematic(position2);
-encoder1 = rad_to_j1(position2_kinematic(1));
-encoder2 = rad_to_j2(position2_kinematic(2));
-encoder3 = rad_to_j3(position2_kinematic(3));
-encoder4 = rad_to_j4(position2_kinematic(4));
-pause(1);
-move(encoder1,encoder2,encoder3,encoder4,3000);
-pause(0.2);
+%target pos
+xyz = coords_to_meters(5,-5,block_height);
+disp(xyz)
+position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/1.9);
+position1_kinematic = choose_kinematic(position1);
+encoder1 = rad_to_j1(position1_kinematic(1));
+encoder2 = rad_to_j2(position1_kinematic(2));
+encoder3 = rad_to_j3(position1_kinematic(3));
+encoder4 = rad_to_j4(position1_kinematic(4));
+plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
+move(encoder1,encoder2,encoder3,encoder4,2250);
 move(encoder1,encoder2,encoder3,encoder4,2000);
-
-
 %%% xy-plane
 
 % Disable Dynamixel Torque
@@ -280,23 +294,23 @@ end
 %function IK = inverse_kinematic_2(x_ef, y_ef, z_ef)
 
 function encoder1 = rad_to_j1(theta1)
-    encoder1=2048+rads_to_steps(theta1);
+    encoder1=2048+rads_to_steps(theta1)
 end
 
 function encoder2 = rad_to_j2(theta2)
-    encoder2=3072-rads_to_steps(theta2);
+    encoder2=3072-rads_to_steps(theta2)
 % if (encoder2 < 760) || (encoder2 > 3290)
 %     warning('Joint 2 angle is out of range');
 % end
 end
 function encoder3 = rad_to_j3(theta3)
-    encoder3=1024-rads_to_steps(theta3);
+    encoder3=1024-rads_to_steps(theta3)
 % if (encoder3 < 695) || (encoder3 > 3060)
 %     warning('Joint 3 angle is out of range');
 % end
 end
 function encoder4 = rad_to_j4(theta4)
-    encoder4=2048-rads_to_steps(theta4);
+    encoder4=2048-rads_to_steps(theta4)
 % if (encoder4 < 820) || (encoder4 > 3450)
 %     warning('Joint 4 angle is out of range');
 % end
@@ -308,7 +322,7 @@ function steps = rads_to_steps(rads)
 end
 
 function coords = coords_to_meters(x,y,z)
-    coords = [x*0.025, y*0.025, z/10];
+    coords = [x*0.025, y*0.025, z];
 end
 
 function command(bytes,register,value)
@@ -331,4 +345,91 @@ function command(bytes,register,value)
         write4ByteTxRx(port_num, 2, DXL_ID_4, register, value);
         write4ByteTxRx(port_num, 2, DXL_ID_5, register, value);
     end
+end
+
+function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
+    % DH parameters for OpenManipulator-X
+    % alpha a d theta (degrees)
+    figure;
+    set(gcf, 'Position', get(0, 'Screensize'));
+    %colororder("glow12");
+    if length(theta1) ~= length(theta2) || length(theta2) ~= length(theta3) || length(theta3) ~= length(theta4)
+        error('Input angle arrays must have the same length');
+    end
+    trace = [];
+    for i = 1:length(theta1)
+        clf;
+        hold on;
+        grid on;
+        xlabel('X');
+        ylabel('Y');
+        zlabel('Z');
+        
+        view(3);
+        DH = DH_table(theta1(i), theta2(i), theta3(i), theta4(i));
+        T0_1 = Ti( DH(1,:));
+        T1_2 = Ti( DH(2,:));
+        T2_3 = Ti( DH(3,:));
+        T3_4 = Ti( DH(4,:));
+        T0_2 = T0_1*T1_2;
+        T0_3 = T0_2*T2_3;
+        T0_4 = T0_3*T3_4;
+        L0=eye(4);
+        L1 = T0_1*L0;
+        L2 = T0_2*L0;
+        L3 = T0_3*L0;
+        L4 = T0_4*L0;
+        % TODO: plot axis instead of points
+        
+
+        plot3([L0(1,4),L1(1,4)],[L0(2,4),L1(2,4)],[L0(3,4),L1(3,4)],'red','LineWidth', 3);
+        plot3([L1(1,4),L2(1,4)],[L1(2,4),L2(2,4)],[L1(3,4),L2(3,4)],'green','LineWidth', 3);
+        plot3([L2(1,4),L3(1,4)],[L2(2,4),L3(2,4)],[L2(3,4),L3(3,4)],'blue','LineWidth', 3);
+        plot3([L3(1,4),L4(1,4)],[L3(2,4),L4(2,4)],[L3(3,4),L4(3,4)],'black','LineWidth', 3);          
+        plot3(L4(1,4), L4(2,4), L4(3,4), 'rx', 'MarkerSize', 10);
+        if draw_lines
+            trace=[trace,L4(1:3,4)];
+            disp(size(trace));
+            for j=1:(size(trace,2)-1)
+                plot3([trace(1,j),trace(1,j+1)],[trace(2,j), trace(2,j+1)],[trace(3,j),trace(3,j+1)],'LineWidth', 3);
+            end            
+        end        
+        axis([-0.15 0.38 -0.38 0.38 0 0.457]);
+        view(45,45);
+        hold off;
+        pause(1);
+    end
+end
+
+function T = Ti(dh_row)
+    % Plot a link based on DH parameters
+    alpha = dh_row(1);
+    a = dh_row(2);
+    d = dh_row(3);
+    theta = dh_row(4);
+
+    % Transformation matrix
+    %T = transformation_matrix_craig(alpha, a, d, theta);
+    T = transformation_matrix(alpha, a, d, theta);
+end
+
+
+function T = transformation_matrix(alpha, a, d, theta)
+    % Calculate DH transformation matrix
+    T = [cos(theta) -sin(theta)*cos(alpha)  sin(theta)*sin(alpha) a*cos(theta);
+        sin(theta) cos(theta)*cos(alpha) -cos(theta)*sin(alpha) a*sin(theta);
+        0 sin(alpha) cos(alpha) d;
+        0 0 0 1];
+end
+
+
+
+function DH = DH_table(theta1, theta2, theta3, theta4)
+    % alpha a d theta (radians)
+    theta_o = asin(0.024/0.130); % offset link angle
+    Joint1 = [deg2rad(90) 0 0.077 theta1];
+    Joint2 = [0 0.13 0 theta2-theta_o];
+    Joint3 = [0 0.124 0 theta3+theta_o];
+    Joint4 = [0 0.126 0 theta4];
+    DH = [Joint1; Joint2; Joint3; Joint4];
 end
