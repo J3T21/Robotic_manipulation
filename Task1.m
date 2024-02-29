@@ -225,3 +225,6 @@ function steps = rads_to_steps(rads)
     steps = rads/step;
 end
 
+function coords = coords_to_meters(x,y,z)
+    coords = [x*0.025, y*0.025, z];
+end
