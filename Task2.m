@@ -148,71 +148,17 @@ write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_VELOCITY, 100
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % TODO: Make the things above into a function
 % move function
-block_height=0.055;
-intermediate_height=0.08;
 %moving block 1
 %initialize
+%2a
+target_pos = [3, -8, 0.055, -pi/2; 9, 0, 0.055, -pi/2; 6, 6, 0.055, -pi/2];
+finish_pos = [5, -5, 0.055, -pi/2; 4, 0, 0.055, -pi/2; 0, 4, 0.055, -pi/2];
+encoders=simple_trajectory(target_pos, finish_pos);
 move(2000,2000,2000,2000,2000);
-xyz = coords_to_meters(3,-8,intermediate_height);
-disp(xyz)
-position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
-position1_kinematic = choose_kinematic(position1);
-encoder1 = rad_to_j1(position1_kinematic(1));
-encoder2 = rad_to_j2(position1_kinematic(2));
-encoder3 = rad_to_j3(position1_kinematic(3));
-encoder4 = rad_to_j4(position1_kinematic(4));
-plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
-%move to block 1
-move(encoder1,encoder2,encoder3,encoder4,2000);
-xyz = coords_to_meters(3,-8,block_height);
-disp(xyz)
-position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
-position1_kinematic = choose_kinematic(position1);
-encoder1 = rad_to_j1(position1_kinematic(1));
-encoder2 = rad_to_j2(position1_kinematic(2));
-encoder3 = rad_to_j3(position1_kinematic(3));
-encoder4 = rad_to_j4(position1_kinematic(4));
-plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
-%move to block 1
-move(encoder1,encoder2,encoder3,encoder4,2000);
-%close the mouth
-move(encoder1,encoder2,encoder3,encoder4,2250);
-
-%intermiediate steps
-xyz = coords_to_meters(3,-8,intermediate_height);
-disp(xyz)
-position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
-position1_kinematic = choose_kinematic(position1);
-encoder1 = rad_to_j1(position1_kinematic(1));
-encoder2 = rad_to_j2(position1_kinematic(2));
-encoder3 = rad_to_j3(position1_kinematic(3));
-encoder4 = rad_to_j4(position1_kinematic(4));
-plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
-move(encoder1,encoder2,encoder3,encoder4,2250);
-
-xyz = coords_to_meters(5,-5,intermediate_height);
-disp(xyz)
-position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
-position1_kinematic = choose_kinematic(position1);
-encoder1 = rad_to_j1(position1_kinematic(1));
-encoder2 = rad_to_j2(position1_kinematic(2));
-encoder3 = rad_to_j3(position1_kinematic(3));
-encoder4 = rad_to_j4(position1_kinematic(4));
-plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
-move(encoder1,encoder2,encoder3,encoder4,2250);
-
-%target pos
-xyz = coords_to_meters(5,-5,block_height);
-disp(xyz)
-position1 = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
-position1_kinematic = choose_kinematic(position1);
-encoder1 = rad_to_j1(position1_kinematic(1));
-encoder2 = rad_to_j2(position1_kinematic(2));
-encoder3 = rad_to_j3(position1_kinematic(3));
-encoder4 = rad_to_j4(position1_kinematic(4));
-plot_OpenManipX(position1_kinematic(1), position1_kinematic(2), position1_kinematic(3), position1_kinematic(4), 0);
-move(encoder1,encoder2,encoder3,encoder4,2250);
-move(encoder1,encoder2,encoder3,encoder4,2000);
+for i=1:height(encoders)
+    move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
+end
+move(2000,2000,2000,2000,2000);
 %%% xy-plane
 
 % Disable Dynamixel Torque
@@ -234,6 +180,55 @@ unloadlibrary(lib_name);
 
 close all;
 clear all;
+%pos([x,y,z,phi])
+function trajec_encoders = simple_trajectory(target_pos, finish_pos)
+    encoder_sequence = [];
+    intermediate_height=0.08; %height for block moving
+    mouth_open=2000;
+    mouth_close=2250;
+    if length(target_pos) ~= length(finish_pos) 
+        error('Input target/finish arrays must have the same length');
+    end
+    for i=1:length(target_pos)
+        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),intermediate_height);
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1_int = rad_to_j1(position_kinematic(1));
+        encoder2_int = rad_to_j2(position_kinematic(2));
+        encoder3_int = rad_to_j3(position_kinematic(3));
+        encoder4_int = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
+        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),target_pos(i,3));
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1_int = rad_to_j1(position_kinematic(1));
+        encoder2_int = rad_to_j2(position_kinematic(2));
+        encoder3_int = rad_to_j3(position_kinematic(3));
+        encoder4_int = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3));
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];        
+    end
+    trajec_encoders = encoder_sequence;
+end
 
 function move(encoder1,encoder2,encoder3,encoder4,encoder5)
 global port_num;
