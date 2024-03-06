@@ -177,107 +177,7 @@ clear all;
 
 
 
-function trajec_encoders = cubic_trajectory(target_pos, finish_pos,time)
-    encoder_sequence = [];
-    intermediate_height=0.08; %height for block moving
-    mouth_open=2000;
-    mouth_close=2250;
-    if length(target_pos) ~= length(finish_pos) 
-        error('Input target/finish arrays must have the same length');
-    end
-    for i=1:length(target_pos)
-        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),intermediate_height);
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1_int = rad_to_j1(position_kinematic(1));
-        encoder2_int = rad_to_j2(position_kinematic(2));
-        encoder3_int = rad_to_j3(position_kinematic(3));
-        encoder4_int = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
-        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),target_pos(i,3));
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1 = rad_to_j1(position_kinematic(1));
-        encoder2 = rad_to_j2(position_kinematic(2));
-        encoder3 = rad_to_j3(position_kinematic(3));
-        encoder4 = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
-       
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
-        position_kinematic2 = choose_kinematic(position);
-         %cubic here
-        interp = cubic_intermediate_joints(position_kinematic,position_kinematic2,time);
-        encoder_sequence = [encoder_sequence; interp,mouth_close];
-        encoder1_int = rad_to_j1(position_kinematic(1));
-        encoder2_int = rad_to_j2(position_kinematic(2));
-        encoder3_int = rad_to_j3(position_kinematic(3));
-        encoder4_int = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3));
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1 = rad_to_j1(position_kinematic(1));
-        encoder2 = rad_to_j2(position_kinematic(2));
-        encoder3 = rad_to_j3(position_kinematic(3));
-        encoder4 = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];        
-    end
-    trajec_encoders = encoder_sequence;
-end
 
-function trajec_encoders = simple_trajectory(target_pos, finish_pos)
-    encoder_sequence = [];
-    intermediate_height=0.08; %height for block moving
-    mouth_open=2000;
-    mouth_close=2250;
-    if length(target_pos) ~= length(finish_pos) 
-        error('Input target/finish arrays must have the same length');
-    end
-    for i=1:length(target_pos)
-        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),intermediate_height);
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1_int = rad_to_j1(position_kinematic(1));
-        encoder2_int = rad_to_j2(position_kinematic(2));
-        encoder3_int = rad_to_j3(position_kinematic(3));
-        encoder4_int = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
-        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),target_pos(i,3));
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1 = rad_to_j1(position_kinematic(1));
-        encoder2 = rad_to_j2(position_kinematic(2));
-        encoder3 = rad_to_j3(position_kinematic(3));
-        encoder4 = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1_int = rad_to_j1(position_kinematic(1));
-        encoder2_int = rad_to_j2(position_kinematic(2));
-        encoder3_int = rad_to_j3(position_kinematic(3));
-        encoder4_int = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3));
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1 = rad_to_j1(position_kinematic(1));
-        encoder2 = rad_to_j2(position_kinematic(2));
-        encoder3 = rad_to_j3(position_kinematic(3));
-        encoder4 = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];        
-    end
-    trajec_encoders = encoder_sequence;
-end
 
 function move(encoder1,encoder2,encoder3,encoder4,encoder5)
 global port_num;
@@ -352,7 +252,7 @@ function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
     IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
 end
 
-function joint_thetas = cubic_intermediate_joints(pos_start, pos_end, time)
+function joint_thetas = cubic_intermediate_joints(pos_start, pos_end, time, mouth)
     theta1_start = pos_start(1);
     theta2_start = pos_start(2);
     theta3_start = pos_start(3);
@@ -362,11 +262,11 @@ function joint_thetas = cubic_intermediate_joints(pos_start, pos_end, time)
     theta3_end = pos_end(3);
     theta4_end = pos_end(4);
     t = 0:0.1:time;
-    theta1 = cubic_theta(t, theta1_start, theta1_end, time);
-    theta2 = cubic_theta(t, theta2_start, theta2_end, time);
-    theta3 = cubic_theta(t, theta3_start, theta3_end, time);
-    theta4 = cubic_theta(t, theta4_start, theta4_end, time);
-    joint_thetas = [theta1; theta2; theta3; theta4];  
+    theta1 = cubic_theta(t, theta1_start, theta1_end, time)';
+    theta2 = cubic_theta(t, theta2_start, theta2_end, time)';
+    theta3 = cubic_theta(t, theta3_start, theta3_end, time)';
+    theta4 = cubic_theta(t, theta4_start, theta4_end, time)';
+    joint_thetas = [rad_to_j1(theta1) rad_to_j2(theta2) rad_to_j3(theta3) rad_to_j4(theta4) mouth*ones(1,length(t))'];
 end
 
 function angle = cubic_theta(t, theta_start, theta_end, tf)
@@ -375,6 +275,114 @@ function angle = cubic_theta(t, theta_start, theta_end, tf)
     a2=3*(theta_end-theta_start)/tf^2;
     a3=-2*(theta_end-theta_start)/tf^3;
     angle= a0+a1*t+a2*t.^2+a3*t.^3;
+end
+
+function trajec_encoders = cubic_trajectory(target_pos, finish_pos,time)
+    encoder_sequence = [];
+    intermediate_height=0.068; %height for block moving
+    mouth_open=2000;
+    mouth_close=2250;
+    if height(target_pos) ~= height(finish_pos) 
+        error('Input target/finish arrays must have the same length');
+    end
+    for i=1:height(target_pos)
+        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),intermediate_height);     
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
+        position_kinematic1 = choose_kinematic(position);
+        encoder1_int = rad_to_j1(position_kinematic1(1));
+        encoder2_int = rad_to_j2(position_kinematic1(2));
+        encoder3_int = rad_to_j3(position_kinematic1(3));
+        encoder4_int = rad_to_j4(position_kinematic1(4));
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
+        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),target_pos(i,3));
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];       
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic2= choose_kinematic(position);
+        %cubic interpolation
+        interp = cubic_intermediate_joints(position_kinematic1,position_kinematic2,time,mouth_close);                
+        encoder_sequence = [encoder_sequence; interp];
+        encoder1_int = rad_to_j1(position_kinematic2(1));
+        encoder2_int = rad_to_j2(position_kinematic2(2));
+        encoder3_int = rad_to_j3(position_kinematic2(3));
+        encoder4_int = rad_to_j4(position_kinematic2(4));
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3));
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
+        if (i<height(target_pos))
+            xyz_next=coords_to_meters(target_pos(i+1,1),target_pos(i+1,2),intermediate_height);
+            position_kinematic4=choose_kinematic(inverse_kinematic(xyz_next(1),xyz_next(2),xyz_next(3),target_pos(i+1,4)));
+            interp = cubic_intermediate_joints(position_kinematic2,position_kinematic4,time,mouth_close);                
+            encoder_sequence = [encoder_sequence; interp];
+        end
+    end
+    trajec_encoders = encoder_sequence;
+end
+
+function trajec_encoders = simple_trajectory(target_pos, finish_pos)
+    encoder_sequence = [];
+    intermediate_height=0.068; %height for block moving
+    mouth_open=2000;
+    mouth_close=2250;
+    if height(target_pos) ~= height(finish_pos) 
+        error('Input target/finish arrays must have the same length');
+    end
+    for i=1:height(target_pos)
+        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),intermediate_height);
+        disp(xyz)
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1_int = rad_to_j1(position_kinematic(1));
+        encoder2_int = rad_to_j2(position_kinematic(2));
+        encoder3_int = rad_to_j3(position_kinematic(3));
+        encoder4_int = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
+        xyz = coords_to_meters(target_pos(i,1),target_pos(i,2),target_pos(i,3));
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),target_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1_int = rad_to_j1(position_kinematic(1));
+        encoder2_int = rad_to_j2(position_kinematic(2));
+        encoder3_int = rad_to_j3(position_kinematic(3));
+        encoder4_int = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3));
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];        
+    end
+    trajec_encoders = encoder_sequence;
 end
 %function IK = inverse_kinematic_2(x_ef, y_ef, z_ef)
 

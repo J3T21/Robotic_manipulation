@@ -33,11 +33,9 @@ plot_OpenManipX(position2_kinematic(1),position2_kinematic(2),position2_kinemati
 % plot_OpenManipX(position(1,1),position(1,2),position(1,3),position(1,4),0);
 % plot_OpenManipX(position(2,1),position(2,2),position(2,3),position(2,4),0);
 % plot_OpenManipX(position_kinematic(1),position_kinematic(2),position_kinematic(3),position_kinematic(4),0);
-angles1=[choose_kinematic(inverse_kinematic(0,0.2,0,-pi/2))];
-angles2=[choose_kinematic(inverse_kinematic(0.2,0.1,0.1,pi/2))];
+angles1=[choose_kinematic(inverse_kinematic(0.225,0,0.068,-pi/2))];
 
-Interp = cubic_intermediate_joints(angles1,angles2,5);
-plot_OpenManipX(Interp(1,:),Interp(2,:),Interp(3,:),Interp(4,:),1);
+plot_OpenManipX(angles1(1),angles1(2),angles1(3),angles1(4),1);
 
 
 %disp(cubic_interp_cartesian([0,0,0,0],[0.1,0.1,0.1,0.1]));
