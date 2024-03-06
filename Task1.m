@@ -27,13 +27,20 @@ position2_kinematic = choose_kinematic(position2);
 plot_OpenManipX(position2_kinematic(1),position2_kinematic(2),position2_kinematic(3),position2_kinematic(4),0);
 %}
 
-xyz = coords_to_meters(3,-8,0.07);
-position = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
-position_kinematic = choose_kinematic(position);
-plot_OpenManipX(position(1,1),position(1,2),position(1,3),position(1,4),0);
-plot_OpenManipX(position(2,1),position(2,2),position(2,3),position(2,4),0);
-plot_OpenManipX(position_kinematic(1),position_kinematic(2),position_kinematic(3),position_kinematic(4),0);
+% xyz = coords_to_meters(3,-8,0.07);
+% position = inverse_kinematic(xyz(1),xyz(2),xyz(3),-pi/2);
+% position_kinematic = choose_kinematic(position);
+% plot_OpenManipX(position(1,1),position(1,2),position(1,3),position(1,4),0);
+% plot_OpenManipX(position(2,1),position(2,2),position(2,3),position(2,4),0);
+% plot_OpenManipX(position_kinematic(1),position_kinematic(2),position_kinematic(3),position_kinematic(4),0);
+angles1=[choose_kinematic(inverse_kinematic(0,0.2,0,-pi/2))];
+angles2=[choose_kinematic(inverse_kinematic(0.2,0.1,0.1,pi/2))];
 
+Interp = cubic_intermediate_joints(angles1,angles2,5);
+plot_OpenManipX(Interp(1,:),Interp(2,:),Interp(3,:),Interp(4,:),1);
+
+
+%disp(cubic_interp_cartesian([0,0,0,0],[0.1,0.1,0.1,0.1]));
 function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
     % alpha a d theta (degrees)
@@ -76,7 +83,7 @@ function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
         plot3(L4(1,4), L4(2,4), L4(3,4), 'rx', 'MarkerSize', 10);
         if draw_lines
             trace=[trace,L4(1:3,4)];
-            disp(size(trace));
+            %disp(size(trace));
             for j=1:(size(trace,2)-1)
                 plot3([trace(1,j),trace(1,j+1)],[trace(2,j), trace(2,j+1)],[trace(3,j),trace(3,j+1)],'LineWidth', 3);
             end            
@@ -160,6 +167,31 @@ function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
     theta4_plus = phi-theta2_plus-theta3_plus;
     theta4_minus = phi-theta2_minus-theta3_minus;
     IK = [theta1, theta2_plus+theta_o, theta3_plus-theta_o, theta4_plus; theta1, theta2_minus+theta_o, theta3_minus-theta_o, theta4_minus];
+end
+
+function joint_thetas = cubic_intermediate_joints(pos_start, pos_end, time)
+    theta1_start = pos_start(1);
+    theta2_start = pos_start(2);
+    theta3_start = pos_start(3);
+    theta4_start = pos_start(4);
+    theta1_end = pos_end(1);
+    theta2_end = pos_end(2);
+    theta3_end = pos_end(3);
+    theta4_end = pos_end(4);
+    t = 0:0.1:time;
+    theta1 = cubic_theta(t, theta1_start, theta1_end, time);
+    theta2 = cubic_theta(t, theta2_start, theta2_end, time);
+    theta3 = cubic_theta(t, theta3_start, theta3_end, time);
+    theta4 = cubic_theta(t, theta4_start, theta4_end, time);
+    joint_thetas = [theta1; theta2; theta3; theta4];  
+end
+
+function angle = cubic_theta(t, theta_start, theta_end, tf)
+    a0=theta_start;
+    a1=0;
+    a2=3*(theta_end-theta_start)/tf^2;
+    a3=-2*(theta_end-theta_start)/tf^3;
+    angle= a0+a1*t+a2*t.^2+a3*t.^3;
 end
 
 function encoder1 = rad_to_j1(theta1)
