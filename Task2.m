@@ -159,16 +159,7 @@ for i=1:height(encoders)
     move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
 end
 move(2000,2000,2000,2000,2000);
-%%% xy-plane
 
-% Disable Dynamixel Torque
-% move(2000,2000,2000,2000,2000);
-
-% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 0);
-% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 0);
-% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_TORQUE_ENABLE, 0);
-% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_TORQUE_ENABLE, 0);
-% write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_TORQUE_ENABLE, 0);
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % Close port
 closePort(port_num);
