@@ -152,9 +152,9 @@ command(1,ADDR_PRO_TORQUE_ENABLE,1);
 %initialize
 %2a
 target_pos = [3, -8, 0.058, -pi/2; 9, 0, 0.058, -pi/2.2; 6, 6, 0.058, -pi/2];
-finish_pos = [5, -5, 0.058, -pi/2; 4, 0, 0.058, -pi/2; 0, 4, 0.058, -pi/2];
-target_pos_rot = [3,-8,0.05, -pi/2;9, 0, 0.05, -pi/2.2; 9, 0, 0.05, -pi/2.2;6, 6, 0.05, -pi/2]
-finish_pos_rot = [3, -8, 0.05, 0 ;9, 0, 0.05, 0;9, 0, 0.05, 0;6, 6, 0.05, 0]
+finish_pos = [5, -5, 0.058, -pi/2; 5, -5, 0.058+0.025, -pi/4; 5, -5, 0.058+0.05, -pi/4];
+target_pos_rot = [9, 0, 0.05, -pi/2.2;]
+finish_pos_rot = [9, 0, 0.05, 0;]
 %2.8 -7.3
 encoders=simple_trajectory(target_pos, finish_pos);
 encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
@@ -162,7 +162,7 @@ encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
 move(2000,2000,2000,2000,2000);
 for i=1:height(encoders)
     move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
-    %move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
+    move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
     %move(encoders_cubic(i,1),encoders_cubic(i,2),encoders_cubic(i,3),encoders_cubic(i,4),encoders_cubic(i,5));
 end
 move(2000,2000,2000,2000,2000);
@@ -342,7 +342,7 @@ end
 
 function trajec_encoders = simple_trajectory(target_pos, finish_pos)
     encoder_sequence = [];
-    intermediate_height=0.068; %height for block moving
+    intermediate_height=0.08; %height for block moving
     mouth_open=2000;
     mouth_close=2250;
     if height(target_pos) ~= height(finish_pos) 
@@ -368,7 +368,7 @@ function trajec_encoders = simple_trajectory(target_pos, finish_pos)
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
         encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height+0.03);
         position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
         position_kinematic = choose_kinematic(position);
         encoder1_int = rad_to_j1(position_kinematic(1));
@@ -385,20 +385,9 @@ function trajec_encoders = simple_trajectory(target_pos, finish_pos)
         encoder4 = rad_to_j4(position_kinematic(4));
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        %edit this one instead
-        
         encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
-        % encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3)+0.05);
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1 = rad_to_j1(position_kinematic(1));
-        encoder2 = rad_to_j2(position_kinematic(2));
-        encoder3 = rad_to_j3(position_kinematic(3));
-        encoder4 = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
 
-            
     end
     trajec_encoders = encoder_sequence;
 end
