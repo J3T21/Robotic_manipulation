@@ -37,7 +37,6 @@ angles1=[choose_kinematic(inverse_kinematic(0.225,0,0.068,-pi/2))];
 
 plot_OpenManipX(angles1(1),angles1(2),angles1(3),angles1(4),1);
 
-
 %disp(cubic_interp_cartesian([0,0,0,0],[0.1,0.1,0.1,0.1]));
 function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
