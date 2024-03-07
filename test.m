@@ -1,9 +1,13 @@
 target_pos = [3, -8, 0.055, -pi/2; 9, 0, 0.055, -pi/2; 6, 6, 0.055, -pi/2];
 finish_pos = [5, -5, 0.055, -pi/2; 4, 0, 0.055, -pi/2; 0, 4, 0.055, -pi/2];
+target_pos_rot = [3,-8,0.05, -pi/2;9, 0, 0.05, -pi/2.2; 9, 0, 0.05, -pi/2.2;6, 6, 0.05, -pi/2];
+finish_pos_rot = [3, -8, 0.05, 0 ;9, 0, 0.05, 0;9, 0, 0.05, 0;6, 6, 0.05, 0];
+encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
 encoders=simple_trajectory(target_pos, finish_pos);
 encoders_cubic=cubic_trajectory(target_pos, finish_pos, 1);
 %plot_OpenManipX(j1_to_rad(encoders(:,1)), j2_to_rad(encoders(:,2)), j3_to_rad(encoders(:,3)), j4_to_rad(encoders(:,4)), 1);
-plot_OpenManipX(j1_to_rad(encoders_cubic(:,1)), j2_to_rad(encoders_cubic(:,2)), j3_to_rad(encoders_cubic(:,3)), j4_to_rad(encoders_cubic(:,4)), 1);
+%plot_OpenManipX(j1_to_rad(encoders_cubic(:,1)), j2_to_rad(encoders_cubic(:,2)), j3_to_rad(encoders_cubic(:,3)), j4_to_rad(encoders_cubic(:,4)), 1);
+plot_OpenManipX(j1_to_rad(encoders_rot(:,1)), j2_to_rad(encoders_rot(:,2)), j3_to_rad(encoders_rot(:,3)), j4_to_rad(encoders_rot(:,4)), 1);
 
 function plot_OpenManipX(theta1, theta2, theta3, theta4, draw_lines)
     % DH parameters for OpenManipulator-X
@@ -261,7 +265,18 @@ function trajec_encoders = simple_trajectory(target_pos, finish_pos)
         encoder4 = rad_to_j4(position_kinematic(4));
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];        
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3)+0.05);
+        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+
+            
     end
     trajec_encoders = encoder_sequence;
 end
