@@ -40,7 +40,7 @@ DXL_ID_3                     = 13;            % Dynamixel ID: 3
 DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
-DEVICENAME                  = 'COM8';       % Check which port is being used on your controller
+DEVICENAME                  = '/dev/cu.usbserial-FT5WJ6Z6';       % Check which port is being used on your controller
 % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -134,11 +134,11 @@ write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_VELOCITY, 100
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_VELOCITY, 1000);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_PRO_GOAL_VELOCITY, 1000);
 %limit accel
-% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_ACCEL, 1);
-% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_ACCEL, 1);
-% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_ACCEL, 1);
-% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_ACCEL, 1);
-% write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_ACCEL, 1);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_ACCEL, 10);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_ACCEL, 10);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_ACCEL, 10);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_ACCEL, 10);
+write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_5, ADDR_ACCEL, 10);
 % enable tourque
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID, ADDR_PRO_TORQUE_ENABLE, 1);
 % write1ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_TORQUE_ENABLE, 1);
@@ -151,13 +151,18 @@ command(1,ADDR_PRO_TORQUE_ENABLE,1);
 %moving block 1
 %initialize
 %2a
-target_pos = [3, -8, 0.055, -pi/2; 9, 0, 0.055, -pi/2; 6, 6, 0.055, -pi/2];
-finish_pos = [5, -5, 0.055, -pi/2; 4, 0, 0.055, -pi/2; 0, 4, 0.055, -pi/2];
+target_pos = [3, -8, 0.058, -pi/2; 9, 0, 0.058, -pi/2.2; 6, 6, 0.058, -pi/2];
+finish_pos = [5, -5, 0.058, -pi/2; 4, 0, 0.058, -pi/2; 0, 4, 0.058, -pi/2];
+target_pos_rot = [3,-8,0.05, -pi/2;9, 0, 0.05, -pi/2.2; 9, 0, 0.05, -pi/2.2;6, 6, 0.05, -pi/2]
+finish_pos_rot = [3, -8, 0.05, 0 ;9, 0, 0.05, 0;9, 0, 0.05, 0;6, 6, 0.05, 0]
+%2.8 -7.3
 encoders=simple_trajectory(target_pos, finish_pos);
 encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
+encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
 move(2000,2000,2000,2000,2000);
 for i=1:height(encoders)
-    move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
+    move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
+    %move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
     %move(encoders_cubic(i,1),encoders_cubic(i,2),encoders_cubic(i,3),encoders_cubic(i,4),encoders_cubic(i,5));
 end
 move(2000,2000,2000,2000,2000);
@@ -200,7 +205,7 @@ write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_4, ADDR_PRO_GOAL_POSITION, enc
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_3, ADDR_PRO_GOAL_POSITION, encoder3);
 write4ByteTxRx(port_num, PROTOCOL_VERSION, DXL_ID_2, ADDR_PRO_GOAL_POSITION, encoder2);
 
-% pause(0.2);
+pause(2);
 
 % pause(0.2);
 
@@ -237,8 +242,8 @@ function IK = inverse_kinematic(x_ef,y_ef,z_ef,phi)
     z_ef=z_ef-0.077;
     theta1 = atan2(y_ef,x_ef);
     r_ef = sqrt(x_ef^2+y_ef^2);
-    r_2 = r_ef-0.126*cos(phi);
-    z_2 = z_ef-0.126*sin(phi);
+    r_2 = r_ef-0.13*cos(phi);
+    z_2 = z_ef-0.13*sin(phi);
     theta3_plus = acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124));
     theta3_minus = -acos((r_2^2+z_2^2-0.13^2-0.124^2)/(2*0.13*0.124));
     costheta2_plus = (r_2*(0.13+0.124*cos(theta3_plus))+z_2*0.124*sin(theta3_plus))/(r_2^2+z_2^2);
@@ -279,7 +284,7 @@ end
 
 function trajec_encoders = cubic_trajectory(target_pos, finish_pos,time)
     encoder_sequence = [];
-    intermediate_height=0.068; %height for block moving
+    intermediate_height=0.08; %height for block moving
     mouth_open=2000;
     mouth_close=2250;
     if height(target_pos) ~= height(finish_pos) 
@@ -337,7 +342,7 @@ end
 
 function trajec_encoders = simple_trajectory(target_pos, finish_pos)
     encoder_sequence = [];
-    intermediate_height=0.068; %height for block moving
+    intermediate_height=0.08; %height for block moving
     mouth_open=2000;
     mouth_close=2250;
     if height(target_pos) ~= height(finish_pos) 
