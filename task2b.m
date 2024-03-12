@@ -40,7 +40,7 @@ DXL_ID_3                     = 13;            % Dynamixel ID: 3
 DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
-DEVICENAME                  = '/dev/cu.usbserial-FT5WJ6Z6';       % Check which port is being used on your controller
+DEVICENAME                  = '/dev/tty.usbserial-FT62AGAD';       % Check which port is being used on your controller
 % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -151,20 +151,33 @@ command(1,ADDR_PRO_TORQUE_ENABLE,1);
 %moving block 1
 %initialize
 %2a
-target_pos = [3, -8, 0.058, -pi/2; 9, 0, 0.058, -pi/2.2; 6, 6, 0.058, -pi/2];
-finish_pos = [5, -5, 0.058, -pi/2; 4, 0, 0.058, -pi/2; 0, 4, 0.058, -pi/2];
-target_pos_rot = [3,-8,0.05, -pi/2;9, 0, 0.05, -pi/2.2; 9, 0, 0.05, -pi/2.2;6, 6, 0.05, -pi/2]
-finish_pos_rot = [3, -8, 0.05, 0 ;9, 0, 0.05, 0;9, 0, 0.05, 0;6, 6, 0.05, 0]
+target_pos = [3, -8, 0.058, -pi/2; 9, 0, 0.058, -pi/4; 6, 6, 0.058, -pi/4;];
+finish_pos = [4.87, -5.15, 0.058, -pi/2; 4.87, -5.15, 0.058+0.025, -pi/4; 4.87, -5.15, 0.058+0.05, -pi/4; ];
+% target_pos_rot = [9, 0, 0.058, -pi/2.2];
+% finish_pos_rot = [8.85, 0, 0.05, 0];
+angle_off1= atan2(3,-8);
+angle_off2= pi/2;
+angle_off3= atan2(6,6);
+target_pos_rot = [3,-8,0.052, -pi/2;                                           9, 0, 0.052, -pi/2.2;                                    9, 0, 0.052, -pi/2.2;6, 6, 0.052, -pi/2];
+finish_pos_rot = [(3-0.2*sin(angle_off1)), (-8-0.2*cos(angle_off1)), 0.052, 0 ;(9-0.22*sin(angle_off2)), (0-0.22*cos(angle_off2)), 0.052, 0;    (9-0.22*sin(angle_off2)), (0-0.22*cos(angle_off2)), 0.052, 0;      (6-0.28*sin(angle_off3)), (6-0.28*cos(angle_off3)), 0.052, 0];
 %2.8 -7.3
+%2.77 -7.6
 encoders=simple_trajectory(target_pos, finish_pos);
 encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
 encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
 move(2000,2000,2000,2000,2000);
-for i=1:height(encoders)
+for i=1:height(encoders_rot)
     move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
     %move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
     %move(encoders_cubic(i,1),encoders_cubic(i,2),encoders_cubic(i,3),encoders_cubic(i,4),encoders_cubic(i,5));
 end
+% for i=1:height(encoders)
+%     %move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
+%     move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
+%     %move(encoders_cubic(i,1),encoders_cubic(i,2),encoders_cubic(i,3),encoders_cubic(i,4),encoders_cubic(i,5));
+% end
+% finalpos = choose_kinematic(inverse_kinematic(coords_to_meters(4.9, -5.2, 0.058+0.08),0,0,0));
+% move(rad_to_j1(finalpos(1)),rad_to_j2(finalpos(2)),rad_to_j3(finalpos(3)),rad_to_j4(finalpos(4)),2250);
 move(2000,2000,2000,2000,2000);
 
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
@@ -342,9 +355,13 @@ end
 
 function trajec_encoders = simple_trajectory(target_pos, finish_pos)
     encoder_sequence = [];
-    intermediate_height=0.068; %height for block moving
-    mouth_open=2000;
+    %intermediate_height=0.08; %height for block moving
+    intermediate_height=0.08;
+    mouth_open=1800;
     mouth_close=2250;
+    %below are for robot 5
+    % mouth_close=1800;
+    % mouth_open=2250;
     if height(target_pos) ~= height(finish_pos) 
         error('Input target/finish arrays must have the same length');
     end
@@ -368,7 +385,7 @@ function trajec_encoders = simple_trajectory(target_pos, finish_pos)
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
         encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height);
+        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),intermediate_height+0.040);
         position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
         position_kinematic = choose_kinematic(position);
         encoder1_int = rad_to_j1(position_kinematic(1));
@@ -385,20 +402,9 @@ function trajec_encoders = simple_trajectory(target_pos, finish_pos)
         encoder4 = rad_to_j4(position_kinematic(4));
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
         encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
-        %edit this one instead
-        
         encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
-        % encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open]; 
-        xyz = coords_to_meters(finish_pos(i,1),finish_pos(i,2),finish_pos(i,3)+0.05);
-        position = inverse_kinematic(xyz(1),xyz(2),xyz(3),finish_pos(i,4));
-        position_kinematic = choose_kinematic(position);
-        encoder1 = rad_to_j1(position_kinematic(1));
-        encoder2 = rad_to_j2(position_kinematic(2));
-        encoder3 = rad_to_j3(position_kinematic(3));
-        encoder4 = rad_to_j4(position_kinematic(4));
-        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+        encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];      
 
-            
     end
     trajec_encoders = encoder_sequence;
 end
