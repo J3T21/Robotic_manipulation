@@ -40,7 +40,7 @@ DXL_ID_3                     = 13;            % Dynamixel ID: 3
 DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
-DEVICENAME                  = '/dev/cu.usbserial-FT5WJ6Z6';       % Check which port is being used on your controller
+DEVICENAME                  = 'COM5';       % Check which port is being used on your controller
 % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 
 TORQUE_ENABLE               = 1;            % Value for enabling the torque

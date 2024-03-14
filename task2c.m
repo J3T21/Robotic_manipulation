@@ -152,7 +152,7 @@ command(1,ADDR_PRO_TORQUE_ENABLE,1);
 %initialize
 %2a
 target_pos = [3, -8, 0.058, -pi/2; 9, 0, 0.058, -pi/2.2; 6, 6, 0.058, -pi/2];
-finish_pos = [5, -5, 0.058, -pi/2; 5, -5, 0.058+0.025, -pi/4; 5, -5, 0.058+0.05, -pi/4];
+finish_pos = [5, -5, 0.058, -pi/2; 5, -5, 0.058+0.025, 0; 5, -5, 0.058+0.05, -pi/4];
 target_pos_rot = [9, 0, 0.05, -pi/2.2;]
 finish_pos_rot = [9, 0, 0.05, 0;]
 %2.8 -7.3
@@ -161,7 +161,7 @@ encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
 encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
 move(2000,2000,2000,2000,2000);
 for i=1:height(encoders)
-    move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
+    %move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
     move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
     %move(encoders_cubic(i,1),encoders_cubic(i,2),encoders_cubic(i,3),encoders_cubic(i,4),encoders_cubic(i,5));
 end
@@ -287,6 +287,7 @@ function trajec_encoders = cubic_trajectory(target_pos, finish_pos,time)
     intermediate_height=0.08; %height for block moving
     mouth_open=2000;
     mouth_close=2250;
+    
     if height(target_pos) ~= height(finish_pos) 
         error('Input target/finish arrays must have the same length');
     end
