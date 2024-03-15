@@ -124,27 +124,28 @@ end
 
 command(1,ADDR_PRO_OPERATING_MODE,3);
 % limit speed so it doesnt spaz
-commad(4,ADDR_PRO_GOAL_VELOCITY,1000);
+command(4,ADDR_PRO_GOAL_VELOCITY,1000);
 %limit accel
 command(4,ADDR_ACCEL,10);
 % enable tourque
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
-
 target_pos = [3, -8, 0.058, -pi/2; 9, 0, 0.058, -pi/2.2; 6, 6, 0.058, -pi/2];
 finish_pos = [5, -5, 0.058, -pi/2; 4, 0, 0.058, -pi/2; 0, 4, 0.058, -pi/2];
 % target_pos_rot = [3,-8,0.05, -pi/2;9, 0, 0.05, -pi/2.2; 9, 0, 0.05, -pi/2.2;6, 6, 0.05, -pi/2];
 % finish_pos_rot = [3, -8, 0.05, 0 ;9, 0, 0.05, 0;9, 0, 0.05, 0;6, 6, 0.05, 0];
 %2.8 -7.3
-encoders=simple_trajectory(target_pos, finish_pos);
-encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
-encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
+% encoders=simple_trajectory(target_pos, finish_pos);
+% encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
+% encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
+draw_pen = draw();
 move(2000,2000,2000,2000,2000);
-for i=1:height(encoders)
+for i=1:height(draw_pen)
     % move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
-    move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
+    % move(encoders(i,1),encoders(i,2),encoders(i,3),encoders(i,4),encoders(i,5));
     %move(encoders_cubic(i,1),encoders_cubic(i,2),encoders_cubic(i,3),encoders_cubic(i,4),encoders_cubic(i,5));
+    move(draw_pen(i,1),draw_pen(i,2),draw_pen(i,3),draw_pen(i,4),draw_pen(i,5));
 end
-move(2000,2000,2000,2000,2000);
+%move(2000,2000,2000,2000,2000);
 
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % Close port
@@ -342,13 +343,163 @@ function command(bytes,register,value)
     end
 end
 
+function trajec_encoders = draw()
+    % 14 cm initial height , 20 cm intermediate,  12 cm
+    encoder_sequence = [];
+ 
+    mouth_open=1760;
+    mouth_close=2538;
+    
+    % go above the pen
+    xyz = coords_to_meters(5,-5,0.2);
+    disp(xyz)
+    position = inverse_kinematic(xyz(1),xyz(2),xyz(3),0);
+    position_kinematic = choose_kinematic(position);
+    encoder1_int = rad_to_j1(position_kinematic(1));
+    encoder2_int = rad_to_j2(position_kinematic(2));
+    encoder3_int = rad_to_j3(position_kinematic(3));
+    encoder4_int = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_open];
 
+    % lower down to the pen
+    xyz = coords_to_meters(5,-5,0.14);
+    position = inverse_kinematic(xyz(1),xyz(2),xyz(3),0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+
+    % grip the pen
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+    % move back up
+    encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+
+    % move to above the bottom left of triangl
+    position = inverse_kinematic(0.2,0.06,0.2,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+    % move to the bottom left of triangle CHANGE 0.07 
+    position = inverse_kinematic(0.2,0.06,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+
+    % move to the midpoint of the hypotenuse
+    position = inverse_kinematic(0.163,0.1,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+    % move to the top of triangle CHANGE 0.07 
+    position = inverse_kinematic(0.125,0.14,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+        % move to the midpoint of the top and bottom right
+    position = inverse_kinematic(0.1625,0.14,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+    % move to the bottom right of triangle CHANGE 0.07 
+    position = inverse_kinematic(0.2,0.14,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+       % move to the midpoint of the base
+    position = inverse_kinematic(0.2,0.1,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+    % move to the bottom left of triangle CHANGE 0.07 
+    position = inverse_kinematic(0.2,0.06,0.105,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+
+    % draw a circle
+    circle_points = generate_circle_coordinates(0.04,[0.2,0.1],1.5*pi,0.5*pi,30);
+    for i = 1:size(circle_points, 1)
+        x = circle_points(i, 1);
+        y = circle_points(i, 2);
+        position = inverse_kinematic(x,y,0.10,0);
+        position_kinematic = choose_kinematic(position);
+        encoder1 = rad_to_j1(position_kinematic(1));
+        encoder2 = rad_to_j2(position_kinematic(2));
+        encoder3 = rad_to_j3(position_kinematic(3));
+        encoder4 = rad_to_j4(position_kinematic(4));
+        encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+    end
+
+    % move to the bottom right of triangle CHANGE 0.07 
+    position = inverse_kinematic(0.2,0.14,0.20,0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+    xyz = coords_to_meters(5,-5,0.2);
+    disp(xyz)
+    position = inverse_kinematic(xyz(1),xyz(2),xyz(3),0);
+    position_kinematic = choose_kinematic(position);
+    encoder1_int = rad_to_j1(position_kinematic(1));
+    encoder2_int = rad_to_j2(position_kinematic(2));
+    encoder3_int = rad_to_j3(position_kinematic(3));
+    encoder4_int = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1_int,encoder2_int,encoder3_int,encoder4_int,mouth_close];
+    xyz = coords_to_meters(5,-5,0.14);
+    position = inverse_kinematic(xyz(1),xyz(2),xyz(3),0);
+    position_kinematic = choose_kinematic(position);
+    encoder1 = rad_to_j1(position_kinematic(1));
+    encoder2 = rad_to_j2(position_kinematic(2));
+    encoder3 = rad_to_j3(position_kinematic(3));
+    encoder4 = rad_to_j4(position_kinematic(4));
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_close];
+
+    encoder_sequence = [encoder_sequence; encoder1,encoder2,encoder3,encoder4,mouth_open];
+
+
+    trajec_encoders = encoder_sequence;
+    
+end
 function coordinates = generate_circle_coordinates(radius, center,start_angle, end_angle, num_points)
     theta = linspace(start_angle, end_angle, num_points);
     x = center(1) + radius * cos(theta);
     y = center(2) + radius * sin(theta);
-    c1_values = repmat(14/1000, num_points, 1); % Generating constant c1 values
-    c2_values = repmat(0, num_points, 1); % Generating constant c2 values
-    coordinates = [x', y',c1_values,c2_values];
+    coordinates = [x', y'];
 end
-
