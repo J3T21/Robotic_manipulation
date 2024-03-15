@@ -145,7 +145,7 @@ move(2065,922,2500,2730,1733);
 % abc_to_instr(coyg);
 % titanic = 'C2CCB,C2CB,C2DE2D2C2CCB,C2CG,7B,C4D4G,G2FED2EFE2DCB,C2CB,C2DE2D2C2E2G2c2';
 % abc_to_instr(titanic);
-st_annes = 'edce dcBA|G2EG CGEG|A2FA DAFA|G2EG CGEG|edce dcBA|G2EG CGEG|AFdc BGAB|dccB c2,CEGC'
+st_annes = 'edce dcBA|G2EG CGEG|A2FA DAFA|G2EG CGEG|edce dcBA|G2EG CGEG|AFdc BGAB|dccB c2,CEGc'
 abc_to_instr(st_annes);
 % notes = ["G" , "A" ,"B","C","D","E","F","G1","A1","B1","C1","D1","E1"];
 % super_simple_trajectory(notes);
