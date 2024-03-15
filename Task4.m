@@ -133,20 +133,25 @@ command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % mary_had = 'AGFG|AAA2|GGG2|AAA2|AGFG|AAAA|GGAG|F4|]';
 % abc_to_instr(mary_had);
 move(2065,922,2500,2730,1733);
-% baa_baa = 'C2C2G2G2|ABcAG4|F2F2E2E2|D2D2C4|G2GGF2F2|E2EED4|G2GGF2F2|E2EE D4 |C2C2 G2G2 | ABcA G4 | F2F2 E2E2 | D2D2 C4 |]'
-% abc_to_instr(baa_baa)%0.1
-%twinkle_twinkle = 'vC C G G|A A G2|F F E E|D D C2|vG G F F|E E D2|uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]'
-%abc_to_instr(twinkle_twinkle)%0.1
-% ad = 'D4D2D2A|GFG2F2|D4AG2FGAGFG2F2|D6DD2AGFG2F2|D2FAG2FGAGFG2F2';
-% abc_to_instr(ad)%0.1
-%fellas = 'EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3';
-%abc_to_instr(fellas);%0.1
-% coyg = 'C6E2D2C2DC6EE2D2C2DC6FF2E2D2D6CDE6E2D2C2DC6EEDCDC6A,ED4C6';
-% abc_to_instr(coyg);
-% titanic = 'C2CCB,C2CB,C2DE2D2C2CCB,C2CG,7B,C4D4G,G2FED2EFE2DCB,C2CB,C2DE2D2C2E2G2c2';
-% abc_to_instr(titanic);
+baa_baa = 'C2C2G2G2|ABcAG4|F2F2E2E2|D2D2C4|G2GGF2F2|E2EED4|G2GGF2F2|E2EE D4 |C2C2 G2G2 | ABcA G4 | F2F2 E2E2 | D2D2 C4 |]'
+abc_to_instr(baa_baa)%0.1
+twinkle_twinkle = 'vC C G G|A A G2|F F E E|D D C2|vG G F F|E E D2|uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]'
+abc_to_instr(twinkle_twinkle)%0.1
+ad = 'D4D2D2A|GFG2F2|D4AG2FGAGFG2F2|D6DD2AGFG2F2|D2FAG2FGAGFG2F2';
+abc_to_instr(ad)%0.1
+fellas = 'EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3';
+abc_to_instr(fellas);%0.1
+coyg = 'C6E2D2C2DC6EE2D2C2DC6FF2E2D2D6CDE6E2D2C2DC6EEDCDC6A,ED4C6';
+abc_to_instr(coyg);
+titanic = 'C2CCB,C2CB,C2DE2D2C2CCB,C2CG,7B,C4D4G,G2FED2EFE2DCB,C2CB,C2DE2D2C2E2G2c2';
+abc_to_instr(titanic);
 st_annes = 'edce dcBA|G2EG CGEG|A2FA DAFA|G2EG CGEG|edce dcBA|G2EG CGEG|AFdc BGAB|dccB c2,CEGc'
-abc_to_instr(st_annes);
+abc_to_instr(st_annes);%0.1
+whiskey = ['G3 G G2 A2|G2 E2 E2 G2|A3 A A2 B2|A2 E4 A2|A3 A A2 B|c2 c2 B2 A2|G2 c2 c2 B2|1 A2 G4 |G3 G G2 A2|G2 E2 E2 G2|A3 A A2 B2|A2 E4 A2|A3 A A2 B|c2 c2 B2 A2|G2 c2 c2 B2|1 A2 G4 G2A2 G2 E2 C2' ...
+    '|D2 DD D2 DD|D20 E2 E2 D2|E3 F G4|A2 A3 G A2|B2 c2 A2 G2|E2 D2 E2 C2||']
+abc_to_instr(whiskey);%0.05
+motd = 'G,2 C2 E2 G2|E E2 E2 E2|E4 F2 G2| E D2 E2 F2|G,2 B,2 D2 F2| D D2 D2 D2|D4 E2 F2|D C2 D2 E2|G,2 C2 E2 G2|E E2 E2 E2|E4 F2 G2| E F2 G2 A2|A2 A2 B2 c2| B B A2 c2| G2 G2 A2 G2| E E D2 C2|'
+abc_to_instr(motd);
 % notes = ["G" , "A" ,"B","C","D","E","F","G1","A1","B1","C1","D1","E1"];
 % super_simple_trajectory(notes);
 %notes = ["D" , "D" ,"D"];
@@ -542,7 +547,7 @@ function instr = abc_to_instr(abc)
     abc=strrep(abc, 'v','');
     chars = char(strsplit(strrep(abc, '|', ''), ''));
     notes=chars;
-    default_pause=0.1;
+    default_pause=0.05;
     fast_pause = 0.012;
     mouth_close=1733;
     intermediate_height=-100;
