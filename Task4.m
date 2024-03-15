@@ -129,9 +129,11 @@ command(4,ADDR_ACCEL,1);
 % enable tourque
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
 
+%mary_had = 'AGFG|AAA2|GGG2|AAA2|AGFG|AAAA|GGAG|F4|]';
+%abc_to_instr(mary_had);try this --james
 
-% mary_had = 'AGFG|AAA2|GGG2|AAA2|AGFG|AAAA|GGAG|F4|]';
-% abc_to_instr(mary_had);try this --james
+%sailors = 'cB|c2C2 C2GF|EGc2 cedc|d2D2 D2GF|EFGA G4|fefg agfe|fedc cBAG|AcBd cedf|e2c2 c2:||:GF|EGcG EGcG|A2F2 F2FE|DAdA DAdA|B2G2 G2e2|fefg agfe|fdec cBAG|AcBd cedf|e2c2 c2:|';
+%abc_to_instr(sailors);
 
 notes = ["G" , "A" ,"B","C","C1","D1","E1"];
 %notes = ["D" , "D" ,"D"];
