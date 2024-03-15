@@ -40,7 +40,7 @@ DXL_ID_3                     = 13;            % Dynamixel ID: 3
 DXL_ID_4                      = 14;            % Dynamixel ID: 4
 DXL_ID_5                      = 15;            % Dynamixel ID: 5
 BAUDRATE                    = 115200;
-DEVICENAME                  = '/dev/tty.usbserial-FT5WJ6Z6';       % Check which port is being used on your controller
+DEVICENAME                  = '/dev/cu.usbserial-FT5WJ6Z6';       % Check which port is being used on your controller
 % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
@@ -123,25 +123,28 @@ end
 % set to control mode
 command(1,ADDR_PRO_OPERATING_MODE,3);
 % limit speed so it doesnt spaz
-command(4,ADDR_PRO_GOAL_VELOCITY,200);
+command(4,ADDR_PRO_GOAL_VELOCITY,100);
 %limit accel
-command(4,ADDR_ACCEL,1);
+command(4,ADDR_ACCEL,0);
 % enable tourque
 command(1,ADDR_PRO_TORQUE_ENABLE,1);
 
-
+% move(2065,922,2500,2730,1733);
 % mary_had = 'AGFG|AAA2|GGG2|AAA2|AGFG|AAAA|GGAG|F4|]';
-% abc_to_instr(mary_had);try this --james
-
-notes = ["G" , "A" ,"B","C","C1","D1","E1"];
+% abc_to_instr(mary_had);
+move(2065,922,2500,2730,1733);
+baa_baa = 'C2C2G2G2|ABcAG4|F2F2E2E2|D2D2C4|G2GGF2F2|E2EED4|G2GGF2F2|E2EE D4 |C2C2 G2G2 | ABcA G4 | F2F2 E2E2 | D2D2 C4 |]'
+abc_to_instr(baa_baa)
+% notes = ["G" , "A" ,"B","C","D","E","F","G1","A1","B1","C1","D1","E1"];
+% super_simple_trajectory(notes);
 %notes = ["D" , "D" ,"D"];
 
 
 %2.8 -7.3
 % encoders_cubic=cubic_trajectory(target_pos, finish_pos, 5);
 % encoders_rot = simple_trajectory(target_pos_rot,finish_pos_rot);
-move(2000,2000,2000,2000,2400);
-encoders=simple_trajectory(notes);
+%move(2000,2000,2000,2000,1733);
+%encoders=simple_trajectory(notes);
 
 % for i=1:height(encoders)
 %     % move(encoders_rot(i,1),encoders_rot(i,2),encoders_rot(i,3),encoders_rot(i,4),encoders_rot(i,5))
@@ -330,7 +333,7 @@ end
 function trajec_encoders = simple_trajectory(notes)
     encoder_sequence = [];
     intermediate_height=0.2; %height for block moving
-    mouth_close=2400;
+    mouth_close=1733;
     for i=1:length(notes)
         xyz = getnote(notes(i));
         % go above note
@@ -362,7 +365,7 @@ end
 function trajec_encoders = super_simple_trajectory(notes)
     encoder_sequence = [];
     intermediate_height=-100; %height for block moving
-    mouth_close=2400;
+    mouth_close=1733;
     for i=1:length(notes)
         xyz = getnote_abs(notes(i));
         % go above note
@@ -522,47 +525,51 @@ end
 function instr = abc_to_instr(abc) 
     % split string into chars
     abc=strrep(abc, ']','');
+    abc=strrep(abc, ' ','');
     chars = char(strsplit(strrep(abc, '|', ''), ''));
     notes=chars;
-    default_pause=1;
-    fast_pause = 0.1;
-    mouth_close=2400;
+    default_pause=0.3;
+    fast_pause = 0.015;
+    mouth_close=1733;
     intermediate_height=-100;
     % disp(notes);
     % disp(isstrprop(notes(1),"alpha"))
     for i = 1:length(notes)
         if (i<length(notes))
             if (isstrprop(notes(i),"alpha") && ~contains(notes(i+1),','))%normal note case
-                xyz = getnote_abs(notes(i));
+                xyz = getnote_abs_new(notes(i));
                 % disp(i);
                 % disp(xyz)
             move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,default_pause);
             move_variable(xyz(1),xyz(2),xyz(3),xyz(4),mouth_close,fast_pause);
+            move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,fast_pause);
             elseif isstrprop(notes(i),"digit")%pause case with following note
                 pause_time = str2double(notes(i));
-                xyz = getnote_abs(notes(i+1));
+                xyz = getnote_abs_new(notes(i+1));
                 % disp(i+1);
                 % disp(xyz)
                 move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,pause_time*default_pause-default_pause);
             else
-                xyz = getnote_abs(strcat(notes(i),','));
+                xyz = getnote_abs_new(strcat(notes(i),','));
                 % disp(i);
                 % disp(xyz)
             move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,default_pause);
-            move_variable(xyz(1),xyz(2),xyz(3),xyz(4),mouth_close,fast_pause);    
+            move_variable(xyz(1),xyz(2),xyz(3),xyz(4),mouth_close,fast_pause);  
+            move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,fast_pause);  
             end%account for movement time
         elseif (isstrprop(notes(i),"digit"))%pause at end of song
-            xyz = getnote_abs(notes(i-1));
+            xyz = getnote_abs_new(notes(i-1));
             % disp(i-1);
             % disp(xyz)
             move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,pause_time*default_pause-default_pause);
             %account for movement time
         elseif isstrprop(notes(i),"alpha")%final note
-            xyz = getnote_abs(notes(i));
+            xyz = getnote_abs_new(notes(i));
             % disp(i);
             % disp(xyz)
             move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,default_pause);
             move_variable(xyz(1),xyz(2),xyz(3),xyz(4),mouth_close,fast_pause);
+            move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,fast_pause);
         else
             warning('Invalid note');
         end
@@ -575,34 +582,34 @@ function note_coords = getnote_abs_new(note)
 
     switch note
         case ("G,")
-            note_coords = [1703,1331,2648,2426];
+            note_coords = [1732,1017,2991,2254];
         case ("A,")
-            note_coords = [1750,1236,2648,2534];
+            note_coords = [1779,935,2901,2503];
         case ("B,")
-            note_coords = [1800,1090,2737,2560];
+            note_coords = [1832,982,2815,2577];
         case 'C'
-            note_coords = [1863,966,2740,2670];
+            note_coords = [1889,968,2773,2663];
         case 'D'
-            note_coords = [1920,966,2740,2670];
+            note_coords = [1950,888,2752,2733];
         case 'E'
-            note_coords = [1970,883,2740,2760];
+            note_coords = [2006,922,2733,2727];
         case 'F'
-            note_coords = [2038,883,2740,2760];
+            note_coords = [2065,922,2733,2730];
         case 'G'
-            note_coords = [2104,883,2740,2761];
+            note_coords = [2130,922,2732,2724];
         case 'A'
-            note_coords = [2158,883,2740,2761];
+            note_coords = [2190,922,2733,2723];
         case 'B'
-            note_coords = [2217,877,2791,2700];
+            note_coords = [2244,990,2725,2668];
         case 'c'
-            note_coords = [2271,1080,2704,2635];
+            note_coords = [2304,1045,2725,2611];
         case 'd'
-            note_coords = [2330,926,2878,2547];
+            note_coords = [2357,1119,2725,2532];
         case 'e'
-            note_coords = [2382,926,2943,2445];
+            note_coords = [2411,1218,2725,2434];
 
         otherwise
-            note_coords = [2038,883,2740,2760];       
+            note_coords = [2065,922,2733,2730];       
     end
 end
 
