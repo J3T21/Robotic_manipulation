@@ -133,8 +133,20 @@ command(1,ADDR_PRO_TORQUE_ENABLE,1);
 % mary_had = 'AGFG|AAA2|GGG2|AAA2|AGFG|AAAA|GGAG|F4|]';
 % abc_to_instr(mary_had);
 move(2065,922,2500,2730,1733);
-baa_baa = 'C2C2G2G2|ABcAG4|F2F2E2E2|D2D2C4|G2GGF2F2|E2EED4|G2GGF2F2|E2EE D4 |C2C2 G2G2 | ABcA G4 | F2F2 E2E2 | D2D2 C4 |]'
-abc_to_instr(baa_baa)
+% baa_baa = 'C2C2G2G2|ABcAG4|F2F2E2E2|D2D2C4|G2GGF2F2|E2EED4|G2GGF2F2|E2EE D4 |C2C2 G2G2 | ABcA G4 | F2F2 E2E2 | D2D2 C4 |]'
+% abc_to_instr(baa_baa)%0.1
+%twinkle_twinkle = 'vC C G G|A A G2|F F E E|D D C2|vG G F F|E E D2|uG G F F|E E D2|vC C G G|A A G2|uF F E E|D D C2|]'
+%abc_to_instr(twinkle_twinkle)%0.1
+% ad = 'D4D2D2A|GFG2F2|D4AG2FGAGFG2F2|D6DD2AGFG2F2|D2FAG2FGAGFG2F2';
+% abc_to_instr(ad)%0.1
+%fellas = 'EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3EB,3GB,3EB,3EB,B3';
+%abc_to_instr(fellas);%0.1
+% coyg = 'C6E2D2C2DC6EE2D2C2DC6FF2E2D2D6CDE6E2D2C2DC6EEDCDC6A,ED4C6';
+% abc_to_instr(coyg);
+% titanic = 'C2CCB,C2CB,C2DE2D2C2CCB,C2CG,7B,C4D4G,G2FED2EFE2DCB,C2CB,C2DE2D2C2E2G2c2';
+% abc_to_instr(titanic);
+st_annes = 'edce dcBA|G2EG CGEG|A2FA DAFA|G2EG CGEG|edce dcBA|G2EG CGEG|AFdc BGAB|dccB c2,CEGC'
+abc_to_instr(st_annes);
 % notes = ["G" , "A" ,"B","C","D","E","F","G1","A1","B1","C1","D1","E1"];
 % super_simple_trajectory(notes);
 %notes = ["D" , "D" ,"D"];
@@ -526,10 +538,12 @@ function instr = abc_to_instr(abc)
     % split string into chars
     abc=strrep(abc, ']','');
     abc=strrep(abc, ' ','');
+    abc=strrep(abc, 'u','');
+    abc=strrep(abc, 'v','');
     chars = char(strsplit(strrep(abc, '|', ''), ''));
     notes=chars;
-    default_pause=0.3;
-    fast_pause = 0.015;
+    default_pause=0.1;
+    fast_pause = 0.012;
     mouth_close=1733;
     intermediate_height=-100;
     % disp(notes);
@@ -549,8 +563,11 @@ function instr = abc_to_instr(abc)
                 % disp(i+1);
                 % disp(xyz)
                 move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,pause_time*default_pause-default_pause);
+            elseif contains(notes(i),',')%skip iteration
+                continue;
             else
                 xyz = getnote_abs_new(strcat(notes(i),','));
+                % i=i+1;
                 % disp(i);
                 % disp(xyz)
             move_variable(xyz(1),xyz(2),xyz(3)+intermediate_height,xyz(4),mouth_close,default_pause);
@@ -586,9 +603,9 @@ function note_coords = getnote_abs_new(note)
         case ("A,")
             note_coords = [1779,935,2901,2503];
         case ("B,")
-            note_coords = [1832,982,2815,2577];
+            note_coords = [1832,982,2785,2577];
         case 'C'
-            note_coords = [1889,968,2773,2663];
+            note_coords = [1889,968,2743,2663];
         case 'D'
             note_coords = [1950,888,2752,2733];
         case 'E'
