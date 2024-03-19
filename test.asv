@@ -1,12 +1,12 @@
 close all;
 %target_pos = [7, -7, 0.06, -pi/3; 7, 2, 0.06, -pi/2; 0, 7, 0.06, -pi/3];
 %finish_pos = [0, -6, 0.06, -pi/3; 9, 0, 0.06, -pi/3; 4, -4, 0.06, -pi/3];
-target_pos_rot = [0,7,0.045, -pi/2;7, 2, 0.05, -pi/2;7, 2, 0.05, -pi/2;7, -7, 0.05, 0];
-finish_pos_rot = [0, 6.965, 0.05, -0.05 ;7, 2, 0.05, -0.05;7, 2, 0.05, -0.05;7,-7,0.05,-pi/2.4];
-%target_pos = [7, -7, 0.06, -pi/3; 7, 2, 0.06, -pi/3; 0, 7, 0.055, -pi/3];
-%finish_pos = [0, -6, 0.052, -pi/3; 0, -6, 0.052+0.025, -pi/3; 0, -6, 0.052+0.05, -pi/3];
-%target_pos_rot = [7,2, 0.06, -pi/2.2; 7, -7, 0.06, 0; 7, -7, 0.06, 0];
-%finish_pos_rot = [(7-0.22*sin(angle_off2)), (2-0.22*cos(angle_off2)), 0.055, 0; (7-0.2*sin(angle_off1)), (-7-0.2*cos(angle_off1)), 0.052, -pi/2; (7-0.2*sin(angle_off1)), (-7-0.2*cos(angle_off1)), 0.052, -pi/2.32];
+%target_pos_rot = [0,7,0.05, -pi/2;7, 2, 0.05, -pi/2;7, 2, 0.05, -pi/2;7, -7, 0.05, 0];
+%finish_pos_rot = [0, 7, 0.05, -0.05 ;7, 2, 0.05, -0.05;7, 2, 0.05, -0.05;7,-7,0.05,-pi/2.34];
+target_pos = [7, -7, 0.06, -pi/3; 7, 2, 0.06, -pi/3; 0, 7, 0.055, -pi/3];
+finish_pos = [0, -6, 0.052, -pi/3; 0, -6, 0.052+0.025, -pi/3; 0, -6, 0.052+0.05, -pi/3];
+target_pos_rot = [7,2, 0.06, -pi/2.2; 7, -7, 0.06, 0; 7, -7, 0.06, 0];
+finish_pos_rot = [(7-0.22*sin(angle_off2)), (2-0.22*cos(angle_off2)), 0.055, 0; (7-0.2*sin(angle_off1)), (-7-0.2*cos(angle_off1)), 0.052, -pi/2; (7-0.2*sin(angle_off1)), (-7-0.2*cos(angle_off1)), 0.052, -pi/2.32];
 
 %target_pos_rot = [3,-8,0.05, -pi/2;9, 0, 0.05, -pi/2.2; 9, 0, 0.05, -pi/2.2;6, 6, 0.05, -pi/2];
 %finish_pos_rot = [3, -8, 0.05, 0 ;9, 0, 0.05, 0;9, 0, 0.05, 0;6, 6, 0.05, 0];
@@ -233,7 +233,7 @@ end
 
 function trajec_encoders = simple_trajectory(target_pos, finish_pos)
     encoder_sequence = [];
-    intermediate_height=0.084; %height for block moving
+    intermediate_height=0.08; %height for block moving
     mouth_open=2000;
     mouth_close=2250;
     if height(target_pos) ~= height(finish_pos) 
