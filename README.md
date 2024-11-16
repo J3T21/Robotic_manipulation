@@ -10,3 +10,4 @@ This Task we had to draw a shape given to us
 This Task was open-ended so we got the robot arm to play the xylophone
 ## Video
 The video can be found here
+https://github.com/J3T21/Robotic_manipulation/blob/main/Robotic%20manipulation.mp4
