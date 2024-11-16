@@ -8,3 +8,5 @@ For this Task we had to move blocks from 3 starting positions to 3 finishing pos
 This Task we had to draw a shape given to us
 ## Task4
 This Task was open-ended so we got the robot arm to play the xylophone
+## Video
+The video can be found here
